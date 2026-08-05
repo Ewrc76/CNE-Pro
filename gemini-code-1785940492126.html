@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CNE Pro - Ingeniería Eléctrica</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent-color: #0284c7;
+      --accent-hover: #0369a1;
+      --text-color: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; padding: 12px; min-height: 100vh; }
+    .container { width: 100%; max-width: 680px; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); }
+    
+    header { text-align: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+    h1 { font-size: 1.5rem; color: #38bdf8; }
+    .author { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+
+    /* Nav Tabs */
+    .tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+    .tab-btn { flex: 1; padding: 10px; background: #0f172a; border: 1px solid var(--border-color); color: var(--text-muted); font-weight: bold; font-size: 0.8rem; border-radius: 6px; cursor: pointer; text-align: center; }
+    .tab-btn.active { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .form-group { margin-bottom: 14px; }
+    label { display: block; margin-bottom: 4px; font-size: 0.85rem; color: #e2e8f0; }
+    select, input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background-color: #0f172a; color: #fff; font-size: 0.95rem; }
+    .row { display: flex; gap: 10px; }
+    .row .form-group { flex: 1; }
+
+    button.btn-calc { width: 100%; padding: 12px; background-color: var(--accent-color); color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 8px; }
+    button.btn-calc:hover { background-color: var(--accent-hover); }
+
+    .results { margin-top: 18px; padding: 14px; background-color: #0f172a; border-radius: 8px; border: 1px solid var(--border-color); }
+    .results h3 { font-size: 1rem; color: #38bdf8; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }
+    .result-item { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.88rem; border-bottom: 1px dashed #334155; }
+    .result-item:last-child { border-bottom: none; }
+    .res-val { font-weight: bold; color: #facc15; text-align: right; }
+    .highlight-box { background: #0284c722; border-left: 4px solid #38bdf8; padding: 8px; margin-top: 8px; font-size: 0.82rem; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.8rem; }
+    th, td { border: 1px solid var(--border-color); padding: 6px; text-align: center; }
+    th { background: #0f172a; color: #38bdf8; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>CNE PRO - Ingeniería Eléctrica</h1>
+    <p class="author">Desarrollado por: Ing. Eric W. Ramos Cabiedes</p>
+  </header>
+
+  <!-- Navegación de Pestañas -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('tabFuerza')">Fuerza y Protecciones</button>
+    <button class="tab-btn" onclick="switchTab('tabIluminacion')">Iluminación (Lúmenes)</button>
+    <button class="tab-btn" onclick="switchTab('tabCargas')">Cuadro de Cargas</button>
+  </div>
+
+  <!-- PESTAÑA 1: FUERZA Y PROTECCIONES -->
+  <div id="tabFuerza" class="tab-content active">
+    <form id="formFuerza">
+      <div class="form-group">
+        <label>Tipo de Carga / Aplicación Especifica:</label>
+        <select id="fuerzaTipo" onchange="actualizarInterfazFuerza()">
+          <option value="ilum">Alumbrado General (Resistivo)</option>
+          <option value="tomas">Tomacorrientes de Uso General</option>
+          <option value="refrig">Refrigeradora / Congeladora (Cadena de Frío)</option>
+          <option value="aire">Aire Acondicionado (Inverter / Compresor)</option>
+          <option value="motor">Motor Eléctrico / Bomba de Agua</option>
+          <option value="especial">Carga Especial / Comercial</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="form-group" style="flex:2;">
+          <label>Potencia:</label>
+          <input type="number" id="fuerzaPot" placeholder="Ej. 1500" step="any">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Unidad:</label>
+          <select id="fuerzaUnidad">
+            <option value="W">W</option>
+            <option value="kW">kW</option>
+            <option value="HP" id="optHP" style="display:none;">HP</option>
+            <option value="BTU" id="optBTU" style="display:none;">BTU/h</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label>Sistema Eléctrico (Perú):</label>
+          <select id="fuerzaSistema">
+            <option value="mono220">Monofásico 220V</option>
+            <option value="tri220">Trifásico 220V</option>
+            <option value="tri380">Trifásico 380V</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Distancia del Circuito (m):</label>
+          <input type="number" id="fuerzaDist" placeholder="Ej. 25" step="any">
+        </div>
+      </div>
+
+      <!-- Tiempos de Trabajo y Reposo (Ciclos) -->
+      <div id="boxCiclos" class="row" style="background:#0f172a; padding:10px; border-radius:6px; margin-bottom:10px;">
+        <div class="form-group">
+          <label>Horas Trabajo/Día:</label>
+          <input type="number" id="fuerzaHTrabajo" value="12" step="any">
+        </div>
+        <div class="form-group">
+          <label>Ciclo Trabajo (%):</label>
+          <input type="number" id="fuerzaDuty" value="50" placeholder="Ej. 50% trabajo">
+        </div>
+      </div>
+
+      <button type="button" class="btn-calc" onclick="calcFuerza()">Calcular Sección y Protecciones</button>
+    </form>
+
+    <div class="results" id="resFuerza" style="display:none;">
+      <h3>Especificación Técnica de Circuito</h3>
+      <div class="result-item"><span>Potencia Calculada:</span><span class="res-val" id="rfPotW">-</span></div>
+      <div class="result-item"><span>Corriente Nominal / Diseño:</span><span class="res-val" id="rfI">-</span></div>
+      <div class="result-item"><span>Sección Conductor (Cobre THHN):</span><span class="res-val" id="rfSeccion">-</span></div>
+      <div class="result-item"><span>Caída de Tensión ($\Delta V$):</span><span class="res-val" id="rfCaida">-</span></div>
+      <div class="result-item"><span>Interruptor Termomagnético (MCB):</span><span class="res-val" id="rfITM">-</span></div>
+      <div class="result-item"><span>Curva de Disparo Sugerida:</span><span class="res-val" id="rfCurva">-</span></div>
+      <div class="result-item"><span>Protección Diferencial (ID):</span><span class="res-val" id="rfDiff">-</span></div>
+      <div class="result-item"><span>Consumo Mensual Est.:</span><span class="res-val" id="rfKwh">-</span></div>
+      
+      <div class="highlight-box" id="rfNotaEspecial"></div>
+    </div>
+  </div>
+
+  <!-- PESTAÑA 2: ILUMINACIÓN -->
+  <div id="tabIluminacion" class="tab-content">
+    <form id="formIlum">
+      <div class="form-group">
+        <label>Tipo de Área / Espacio (Norma CNE / Lux):</label>
+        <select id="ilumArea">
+          <option value="oficina">Oficinas / Aulas (500 Lux - 4000K-5000K)</option>
+          <option value="sala">Residencia / Sala (200 Lux - 2700K-3000K)</option>
+          <option value="cocina">Cocina / Laboratorio (300 Lux - 4000K)</option>
+          <option value="pasadizo">Pasadizos / Depósito (100 Lux - 3000K)</option>
+          <option value="taller">Taller / Inspección (750 Lux - 6500K)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="form-group"><label>Largo (m):</label><input type="number" id="ilumLargo" placeholder="Ej. 6"></div>
+        <div class="form-group"><label>Ancho (m):</label><input type="number" id="ilumAncho" placeholder="Ej. 4"></div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label>Montaje:</label>
+          <select id="ilumMontaje">
+            <option value="adosado">Adosado a Techo</option>
+            <option value="empotrado">Empotrado (Falso Techo)</option>
+            <option value="colgante">Colgante / Suspendido</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Modo Lámpara:</label>
+          <select id="ilumModoLamp" onchange="toggleModoLamp()">
+            <option value="auto">Automático (Sugerido)</option>
+            <option value="manual">Manual (Ingresar datos)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="boxLampManual" class="row" style="display:none;">
+        <div class="form-group"><label>Watts Lámpara:</label><input type="number" id="lampWattsManual" placeholder="18"></div>
+        <div class="form-group"><label>Lúmenes Lámpara:</label><input type="number" id="lampLumManual" placeholder="1600"></div>
+      </div>
+
+      <button type="button" class="btn-calc" onclick="calcIluminacion()">Calcular Iluminación</button>
+    </form>
+
+    <div class="results" id="resIlum" style="display:none;">
+      <h3>Propuesta Lumínica</h3>
+      <div class="result-item"><span>Área Total:</span><span class="res-val" id="riArea">-</span></div>
+      <div class="result-item"><span>Flujo Luminoso Requerido:</span><span class="res-val" id="riLumTot">-</span></div>
+      <div class="result-item"><span>Temperatura Color (Kelvin):</span><span class="res-val" id="riKelvin">-</span></div>
+      <div class="result-item"><span>Lámpara Seleccionada:</span><span class="res-val" id="riLampInfo">-</span></div>
+      <div class="result-item"><span>Cantidad Total de Luminarias:</span><span class="res-val" id="riCant">-</span></div>
+      <div class="result-item"><span>Distribución Grilla:</span><span class="res-val" id="riDistribu">-</span></div>
+      <div class="result-item"><span>Potencia Total Iluminación:</span><span class="res-val" id="riPotTot">-</span></div>
+    </div>
+  </div>
+
+  <!-- PESTAÑA 3: CUADRO DE CARGAS -->
+  <div id="tabCargas" class="tab-content">
+    <form id="formCargaItem">
+      <div class="row">
+        <div class="form-group" style="flex:2;">
+          <label>Descripción del Circuito:</label>
+          <input type="text" id="ccDesc" placeholder="Ej. C1 - Alumbrado 1er Piso">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Carga (W):</label>
+          <input type="number" id="ccWatts" placeholder="Ej. 1200">
+        </div>
+      </div>
+      <button type="button" class="btn-calc" style="background:#059669;" onclick="agregarCargaTabla()">+ Agregar al Cuadro</button>
+    </form>
+
+    <div class="results">
+      <h3>Cuadro de Cargas CNE</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Ckt</th>
+            <th>Descripción</th>
+            <th>Carga (W)</th>
+            <th>F. Demanda</th>
+            <th>Max. Dem. (W)</th>
+          </tr>
+        </thead>
+        <tbody id="tablaCargasBody"></tbody>
+      </table>
+      
+      <div style="margin-top:12px;">
+        <div class="result-item"><span>Carga Total Instalada:</span><span class="res-val" id="ccTotalInst">-</span></div>
+        <div class="result-item"><span>Máxima Demanda Estimada:</span><span class="res-val" id="ccMaxDemanda">-</span></div>
+        <div class="result-item"><span>Acometida / Llave General:</span><span class="res-val" id="ccITMGen">-</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+  }
+
+  function actualizarInterfazFuerza() {
+    const tipo = document.getElementById('fuerzaTipo').value;
+    const optHP = document.getElementById('optHP');
+    const optBTU = document.getElementById('optBTU');
+    const u = document.getElementById('fuerzaUnidad');
+    const dutyInput = document.getElementById('fuerzaDuty');
+
+    optHP.style.display = (tipo === 'motor') ? 'block' : 'none';
+    optBTU.style.display = (tipo === 'aire') ? 'block' : 'none';
+
+    if (tipo === 'motor') u.value = 'HP';
+    else if (tipo === 'aire') u.value = 'BTU';
+    else u.value = 'W';
+
+    if (tipo === 'refrig') dutyInput.value = 50; // 50% trabajo reposo por termostato
+    else if (tipo === 'aire') dutyInput.value = 70;
+    else dutyInput.value = 100;
+  }
+
+  function calcFuerza() {
+    const tipo = document.getElementById('fuerzaTipo').value;
+    const pInput = parseFloat(document.getElementById('fuerzaPot').value);
+    const unidad = document.getElementById('fuerzaUnidad').value;
+    const sistema = document.getElementById('fuerzaSistema').value;
+    const L = parseFloat(document.getElementById('fuerzaDist').value);
+    const hTrabajo = parseFloat(document.getElementById('fuerzaHTrabajo').value) || 12;
+    const duty = (parseFloat(document.getElementById('fuerzaDuty').value) || 100) / 100;
+
+    if(!pInput || !L) { alert("Por favor ingrese Potencia y Distancia."); return; }
+
+    let W = pInput;
+    if (unidad === 'kW') W *= 1000;
+    if (unidad === 'HP') W *= 746;
+    if (unidad === 'BTU') W *= 0.293071;
+
+    let V = 220, esTri = false;
+    if(sistema === 'tri220') { V = 220; esTri = true; }
+    if(sistema === 'tri380') { V = 380; esTri = true; }
+
+    let fp = (tipo === 'motor' || tipo === 'aire') ? 0.85 : 0.90;
+    let I = esTri ? (W / (Math.sqrt(3) * V * fp)) : (W / (V * fp));
+    let I_diseno = I * (tipo === 'motor' || tipo === 'aire' ? 1.25 : 1.0);
+
+    // Sección por Caída de Tensión (2.5% max CNE)
+    let deltaV_max = V * 0.025;
+    let K = esTri ? 0.0304 : 0.035;
+    let S_calc = (K * I * L) / deltaV_max;
+
+    const tablaCobre = [
+      { mm2: 2.5, amp: 20 }, { mm2: 4.0, amp: 25 }, { mm2: 6.0, amp: 35 },
+      { mm2: 10.0, amp: 50 }, { mm2: 16.0, amp: 65 }, { mm2: 25.0, amp: 85 }
+    ];
+
+    let sec = 2.5;
+    for(let c of tablaCobre) {
+      if(c.amp >= I_diseno && c.mm2 >= S_calc) { sec = c.mm2; break; }
+    }
+
+    let dV_real = (K * I * L) / sec;
+    let porcDv = (dV_real / V) * 100;
+
+    const itmList = [10, 16, 20, 25, 32, 40, 50, 63, 80];
+    let itm = itmList.find(a => a >= I_diseno) || 80;
+
+    // Determinar Curva de Disparo, Diferencial y Notas Especiales
+    let curva = "Curva C (General / Residencial)";
+    let diff = "30mA Tipo AC / Clase A";
+    let nota = "";
+
+    if (tipo === 'ilum') {
+      curva = "Curva B (Resistiva / Alumbrado)";
+      diff = "30mA Tipo AC";
+    } else if (tipo === 'refrig') {
+      curva = "Curva C (Compresor pequeño)";
+      diff = "30mA Superinmunizado (SI) + AUTOARMABLE";
+      nota = "<strong>CIRCUITO INDEPENDIENTE:</strong> Requiere diferencial <em>Superinmunizado con Reconexión Automática</em> para asegurar la preservación de la cadena de frío contra transitorios o fallas de red.";
+    } else if (tipo === 'aire') {
+      curva = "Curva D / C (Inverter)";
+      diff = "30mA Superinmunizado (SI / Tipo F)";
+      nota = "<strong>CARGA ESPECIAL / INVERTER:</strong> El A/C genera frecuencias armónicas de alta frecuencia. Obligatorio Diferencial Superinmunizado para evitar disparos en falso.";
+    } else if (tipo === 'motor') {
+      curva = "Curva D (Picos de arranque directo)";
+      diff = "30mA Clase A / Superinmunizado";
+      nota = "<strong>MOTORES:</strong> El ITM de Curva D tolera el pico de corriente inicial de arranque (5 a 10 veces In).";
+    }
+
+    // Consumo kWh/mes con duty cycle
+    let kWhMes = (W / 1000) * (hTrabajo * duty) * 30;
+
+    document.getElementById('rfPotW').innerText = W.toFixed(1) + " W";
+    document.getElementById('rfI').innerText = I_diseno.toFixed(2) + " A";
+    document.getElementById('rfSeccion').innerText = sec + " mm²";
+    document.getElementById('rfCaida').innerText = porcDv.toFixed(2) + "% (" + dV_real.toFixed(1) + " V)";
+    document.getElementById('rfITM').innerText = itm + " A";
+    document.getElementById('rfCurva').innerText = curva;
+    document.getElementById('rfDiff').innerText = diff;
+    document.getElementById('rfKwh').innerText = kWhMes.toFixed(1) + " kWh/mes";
+    document.getElementById('rfNotaEspecial').innerHTML = nota || "Circuito dimensionado según normas del CNE de Perú.";
+    document.getElementById('resFuerza').style.display = 'block';
+  }
+
+  // MODULO 2: ILUMINACIÓN
+  function toggleModoLamp() {
+    const modo = document.getElementById('ilumModoLamp').value;
+    document.getElementById('boxLampManual').style.display = (modo === 'manual') ? 'flex' : 'none';
+  }
+
+  function calcIluminacion() {
+    const areaTipo = document.getElementById('ilumArea').value;
+    const largo = parseFloat(document.getElementById('ilumLargo').value);
+    const ancho = parseFloat(document.getElementById('ilumAncho').value);
+    const montaje = document.getElementById('ilumMontaje').value;
+    const modoLamp = document.getElementById('ilumModoLamp').value;
+
+    if(!largo || !ancho) { alert("Ingrese las dimensiones del área."); return; }
+
+    const area = largo * ancho;
+    let lux = 300, kelvin = "4000K (Blanco Neutro)";
+
+    if(areaTipo === 'oficina') { lux = 500; kelvin = "4000K - 5000K (Luz Neutra/Trabajo)"; }
+    else if(areaTipo === 'sala') { lux = 200; kelvin = "2700K - 3000K (Cálido Residencial)"; }
+    else if(areaTipo === 'cocina') { lux = 300; kelvin = "4000K (Neutro)"; }
+    else if(areaTipo === 'pasadizo') { lux = 100; kelvin = "3000K (Cálido)"; }
+    else if(areaTipo === 'taller') { lux = 750; kelvin = "6500K (Luz Día / Alta Precisión)"; }
+
+    let fu = 0.5;
+    if(montaje === 'empotrado') fu = 0.55;
+    if(montaje === 'colgante') fu = 0.45;
+
+    const flujoTotalReq = (lux * area) / (fu * 0.8);
+
+    let wLamp = 18, lmLamp = 1600, descLamp = "Panel LED 18W";
+
+    if(modoLamp === 'manual') {
+      wLamp = parseFloat(document.getElementById('lampWattsManual').value) || 18;
+      lmLamp = parseFloat(document.getElementById('lampLumManual').value) || 1600;
+      descLamp = "Lámpara Usuario " + wLamp + "W";
+    } else {
+      if(areaTipo === 'sala') { wLamp = 10; lmLamp = 900; descLamp = "Foco LED 10W"; }
+      if(areaTipo === 'taller') { wLamp = 36; lmLamp = 3600; descLamp = "Luminaria Hermética 36W"; }
+    }
+
+    let nLamps = Math.ceil(flujoTotalReq / lmLamp);
+    let ratio = largo / ancho;
+    let nY = Math.round(Math.sqrt(nLamps / ratio)) || 1;
+    let nX = Math.ceil(nLamps / nY);
+    let nTotal = nX * nY;
+
+    document.getElementById('riArea').innerText = area.toFixed(2) + " m²";
+    document.getElementById('riLumTot').innerText = Math.round(flujoTotalReq) + " lm (" + lux + " Lux)";
+    document.getElementById('riKelvin').innerText = kelvin;
+    document.getElementById('riLampInfo').innerText = descLamp + " (" + lmLamp + " lm)";
+    document.getElementById('riCant').innerText = nTotal + " Lámparas";
+    document.getElementById('riDistribu').innerText = nX + " filas x " + nY + " columnas";
+    document.getElementById('riPotTot').innerText = (nTotal * wLamp) + " W";
+    document.getElementById('resIlum').style.display = 'block';
+  }
+
+  // MODULO 3: CUADRO DE CARGAS
+  let listaCargas = [];
+
+  function agregarCargaTabla() {
+    const desc = document.getElementById('ccDesc').value;
+    const watts = parseFloat(document.getElementById('ccWatts').value);
+
+    if(!desc || !watts) { alert("Complete la descripción y potencia."); return; }
+
+    listaCargas.push({ id: listaCargas.length + 1, desc, watts });
+    document.getElementById('ccDesc').value = '';
+    document.getElementById('ccWatts').value = '';
+    renderTablaCargas();
+  }
+
+  function renderTablaCargas() {
+    const tbody = document.getElementById('tablaCargasBody');
+    tbody.innerHTML = '';
+    let totInst = 0;
+
+    listaCargas.forEach((item) => {
+      totInst += item.watts;
+      let fDemanda = item.watts > 1500 ? 0.8 : 1.0;
+      let cMax = item.watts * fDemanda;
+
+      let tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>C-${item.id}</td>
+        <td>${item.desc}</td>
+        <td>${item.watts} W</td>
+        <td>${fDemanda.toFixed(2)}</td>
+        <td>${cMax.toFixed(0)} W</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    let maxDemanda = totInst > 3000 ? (3000 + (totInst - 3000) * 0.35) : totInst;
+    let iGen = maxDemanda / (220 * 0.9);
+
+    const itmList = [16, 20, 25, 32, 40, 50, 63, 80, 100];
+    let itmG = itmList.find(a => a >= (iGen * 1.25)) || 100;
+
+    document.getElementById('ccTotalInst').innerText = totInst + " W";
+    document.getElementById('ccMaxDemanda').innerText = Math.round(maxDemanda) + " W";
+    document.getElementById('ccITMGen').innerText = itmG + " A (Llave General)";
+  }
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js');
+  }
+</script>
+
+</body>
+</html>
