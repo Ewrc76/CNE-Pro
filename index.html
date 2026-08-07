@@ -1,389 +1,224 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CNE Pro - Calculadora Eléctrica Perú</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0284c7">
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- jsPDF para generación de reportes -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <style>
-    body { font-family: system-ui, -apple-system, sans-serif; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora CNE y Selector de Protecciones Pro</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f9fa; color: #333; }
+        h1, h2 { color: #0056b3; }
+        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 15px; background: white; }
+        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: center; font-size: 14px; }
+        th { background-color: #007bff; color: white; }
+        input, select { padding: 8px; margin: 5px; width: calc(100% - 20px); max-width: 220px; }
+        button { padding: 10px 15px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; }
+        button.btn-danger { background: #dc3545; }
+        button:hover { opacity: 0.9; }
+        .results-box { background: #e9ecef; padding: 15px; border-radius: 6px; margin-top: 15px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-12">
+<body>
 
-  <!-- Encabezado -->
-  <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50 shadow-lg">
-    <div class="max-w-4xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img src="Eric.png" alt="Asesoría Eléctrica Eric" class="w-12 h-12 rounded-full border-2 border-sky-500 object-cover">
-        <div>
-          <h1 class="font-bold text-lg text-sky-400 leading-tight">CNE Pro</h1>
-          <p class="text-xs text-slate-400">Dimensionamiento Eléctrico (CNE / IEC Perú)</p>
+    <h1>Calculadora de Cuadro de Cargas CNE & Seleccionador de Protecciones</h1>
+    <p>Herramienta técnica para el cálculo de Máxima Demanda (CNE Utilización) y especificación de protecciones eléctricas avanzadas.</p>
+
+    <!-- SECCIÓN 1: ÁREAS TECHADAS -->
+    <div class="card">
+        <h2>1. Cálculo de Área Techada a Considerar (Regla 050-110 CNE)</h2>
+        <div class="grid-2">
+            <div>
+                <label>Área de Pisos Superiores / Piso 1 (100%):</label><br>
+                <input type="number" id="areaPisoVal" placeholder="Ej: 100 m²">
+                <button onclick="agregarArea('piso')">Añadir Piso</button>
+            </div>
+            <div>
+                <label>Área de Sótano (75%):</label><br>
+                <input type="number" id="areaSotanoVal" placeholder="Ej: 50 m²">
+                <button onclick="agregarArea('sotano')">Añadir Sótano</button>
+            </div>
         </div>
-      </div>
-      <button onclick="abrirModalPDF()" class="bg-sky-600 hover:bg-sky-500 text-white font-medium px-3 py-2 rounded-lg text-sm flex items-center gap-2 shadow">
-        📄 Reporte PDF
-      </button>
+        <p><strong>Área Total Ponderada Acumulada:</strong> <span id="lblAreaTotal">0</span> m²</p>
     </div>
-  </header>
 
-  <main class="max-w-4xl mx-auto p-4 space-y-6">
-
-    <!-- Configuración del Circuito y Longitud -->
-    <section class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-md">
-      <h2 class="text-lg font-bold text-sky-400 mb-4 flex items-center gap-2">
-        ⚙️ Parámetros del Tramo y Circuito
-      </h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Tensión -->
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">Tensión Nominal (V)</label>
-          <select id="tension" onchange="calcular()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm font-semibold text-white focus:border-sky-500 outline-none">
-            <option value="220" selected>220 V (Monofásico Perú)</option>
-            <option value="380">380 V (Trifásico + Neutro)</option>
-            <option value="110">110 V (Especial)</option>
-          </select>
+    <!-- SECCIÓN 2: CUADRO DE CARGAS -->
+    <div class="card">
+        <h2>2. Cuadro de Cargas y Demanda Máxima</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Descripción del Circuito / Equipo</th>
+                    <th>Potencia Instalada (W)</th>
+                    <th>Factor de Demanda</th>
+                    <th>Máxima Demanda (W)</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoTablaCargas">
+                <!-- Filas dinámicas -->
+            </tbody>
+        </table>
+        <button onclick="agregarFilaCarga()">+ Agregar Carga Manual</button>
+        <button onclick="calcularCuadroCargas()" style="background-color: #0056b3;">Calcular Cuadro Completo</button>
+        
+        <div class="results-box">
+            <h3>Resultados Generales:</h3>
+            <p><strong>Potencia Instalada Total:</strong> <span id="resPotInstalada">0</span> W</p>
+            <p><strong>Máxima Demanda Total (CNE):</strong> <span id="resMaxDemanda">0</span> W</p>
+            <p><strong>Potencia a Contratar Recomendada (Factor Simultaniedad 0.8):</strong> <span id="resContratada">0</span> kW</p>
         </div>
-
-        <!-- Factor de Seguridad -->
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">Factor de Seguridad (FS)</label>
-          <select id="factorSeguridad" onchange="calcular()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm font-semibold text-white focus:border-sky-500 outline-none">
-            <option value="1.0">1.0 (Sin sobredimensionar)</option>
-            <option value="1.25" selected>1.25 (Recomendado CNE 125%)</option>
-            <option value="1.6">1.6 (Motores / Cargas inductivas)</option>
-          </select>
-        </div>
-
-        <!-- Distancia del Tramo -->
-        <div>
-          <label class="block text-xs text-sky-400 font-bold mb-1">📏 Longitud del Tramo (Metros)</label>
-          <input type="number" id="distancia" value="15" min="1" step="1" oninput="calcular()" class="w-full bg-slate-900 border border-sky-500 rounded-lg p-2.5 text-sm font-bold text-white outline-none">
-          <p class="text-[10px] text-slate-400 mt-1">*Distancia desde el tablero hasta el punto final</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Tabla de Cargas / Equipos -->
-    <section class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-md">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-bold text-sky-400 flex items-center gap-2">
-          🔌 Cargas y Artefactos
-        </h2>
-        <button onclick="agregarFilaCarga()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 shadow">
-          + Agregar Carga
-        </button>
-      </div>
-
-      <!-- Presets de Cargas Rápidas -->
-      <div class="mb-4">
-        <p class="text-xs text-slate-400 mb-2">Insertar directo:</p>
-        <div class="flex flex-wrap gap-2 text-xs">
-          <button onclick="agregarPreset('Duchas Eléctricas / Rapiducha', 4500)" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded-full text-slate-300">🚿 Rapiducha (4.5kW)</button>
-          <button onclick="agregarPreset('Microondas', 1200)" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded-full text-slate-300">🍿 Microondas (1.2kW)</button>
-          <button onclick="agregarPreset('Refrigeradora / Freezer', 350)" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded-full text-slate-300">🧊 Refrigeradora (350W)</button>
-          <button onclick="agregarPreset('Hervador de Agua', 1500)" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded-full text-slate-300">☕ Hervador (1.5kW)</button>
-          <button onclick="agregarPreset('Lavadora / Secadora', 2000)" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded-full text-slate-300">🧺 Lavadora (2kW)</button>
-          <button onclick="agregarPreset('Aire Acondicionado 12000 BTU', 1200)" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded-full text-slate-300">❄️ Aire Acond. (1.2kW)</button>
-        </div>
-      </div>
-
-      <!-- Lista de Cargas -->
-      <div id="contenedorCargas" class="space-y-3"></div>
-    </section>
-
-    <!-- Diagnóstico y Cálculo de Conductor -->
-    <section class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-md space-y-4">
-      <h2 class="text-lg font-bold text-sky-400 mb-2 flex items-center gap-2">
-        📊 Paquete de Cálculo y Dimensionamiento
-      </h2>
-
-      <!-- Resumen de Métricas -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-        <div class="bg-slate-900 p-3 rounded-xl border border-slate-700">
-          <p class="text-xs text-slate-400">Potencia Total</p>
-          <p id="resPotencia" class="text-xl font-bold text-white">0 W</p>
-        </div>
-        <div class="bg-slate-900 p-3 rounded-xl border border-slate-700">
-          <p class="text-xs text-slate-400">Corriente Nom. / Diseño</p>
-          <p id="resCorriente" class="text-xl font-bold text-amber-400">0.00 A</p>
-        </div>
-        <div class="bg-slate-900 p-3 rounded-xl border border-slate-700">
-          <p class="text-xs text-slate-400">Distancia del Tramo</p>
-          <p id="resDistanciaUI" class="text-xl font-bold text-sky-400">0 m</p>
-        </div>
-        <div class="bg-slate-900 p-3 rounded-xl border border-slate-700">
-          <p class="text-xs text-slate-400">Caída de Tensión (ΔV)</p>
-          <p id="resCaidaTension" class="text-xl font-bold text-emerald-400">0.00 %</p>
-        </div>
-      </div>
-
-      <!-- Cuadro de Sugerencias de Protección y Conductor -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-        <!-- Conductor Recomendado -->
-        <div class="bg-slate-900/80 p-4 rounded-xl border border-sky-500/50">
-          <p class="text-xs text-emerald-400 font-bold uppercase tracking-wider mb-1">📐 Conductor Recomendado (CNE)</p>
-          <p id="resCable" class="text-2xl font-extrabold text-white">-- mm²</p>
-          <p id="resAWG" class="text-xs text-slate-300 mt-1">Equivalente: --</p>
-          <p id="resDetalleCaida" class="text-[11px] text-sky-300 mt-1">Pérdida estimada: -- V</p>
-        </div>
-
-        <!-- Breaker Termomagnético (ITM) -->
-        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
-          <p class="text-xs text-sky-400 font-bold uppercase tracking-wider mb-1">⚡ Termomagnético (ITM)</p>
-          <p id="resITM" class="text-2xl font-extrabold text-white">-- A</p>
-          <p id="resCurvaITM" class="text-xs text-slate-300 mt-1">Curva: C</p>
-        </div>
-
-        <!-- Interruptor Diferencial (ID) -->
-        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
-          <p class="text-xs text-purple-400 font-bold uppercase tracking-wider mb-1">🛡️ Diferencial (ID)</p>
-          <p id="resID" class="text-2xl font-extrabold text-white">-- A / 30mA</p>
-          <p id="resTipoID" class="text-xs text-slate-300 mt-1">Clase AC / A (30mA)</p>
-        </div>
-      </div>
-
-      <!-- Alertas de Seguridad y Norma CNE -->
-      <div id="cajaAlerta" class="p-4 rounded-xl hidden text-sm font-medium"></div>
-    </section>
-
-  </main>
-
-  <!-- Modal para Generar Informe PDF -->
-  <div id="modalPDF" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700 max-w-lg w-full space-y-4 shadow-2xl">
-      <h3 class="text-lg font-bold text-sky-400">📄 Generar Informe Técnico PDF</h3>
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">Nombre del Cliente / Trabajo</label>
-          <input type="text" id="pdfCliente" placeholder="Ej: Residencia Sr. Ramos" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none">
-        </div>
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">Electricista / Especialista</label>
-          <input type="text" id="pdfElectricista" value="Asesoría Eléctrica Eric" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none">
-        </div>
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">Ubicación / N° de Obra</label>
-          <input type="text" id="pdfObra" placeholder="Ej: Tablero Secundario - Circuito Cocina" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none">
-        </div>
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">Observaciones Técnicas</label>
-          <textarea id="pdfNotas" rows="2" placeholder="Notas sobre la canalización, tubería o instalación..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none"></textarea>
-        </div>
-      </div>
-      <div class="flex gap-3 pt-2">
-        <button onclick="cerrarModalPDF()" class="w-1/2 bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 rounded-lg text-sm">Cancelar</button>
-        <button onclick="descargarPDF()" class="w-1/2 bg-sky-600 hover:bg-sky-500 text-white font-medium py-2 rounded-lg text-sm font-bold">Descargar PDF</button>
-      </div>
     </div>
-  </div>
 
-  <script>
-    // Registro de Service Worker para PWA
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(() => console.log('SW no registrado'));
-    }
+    <!-- SECCIÓN 3: SELECCIÓN AVANZADA DE PROTECCIONES Y DIFERENCIALES -->
+    <div class="card">
+        <h2>3. Criterio de Selección de Protecciones Específicas</h2>
+        <p>Selecciona el tipo de circuito o equipo crítico para determinar la protección termomagnética, diferencial y contra sobretensiones adecuada:</p>
+        
+        <label>Tipo de Carga / Aplicación:</label>
+        <select id="tipoCargaProteccion" onchange="actualizarRecomendacionProteccion()">
+            <option value="general">Tablero General / Iluminación y Tomacorrientes Generales</option>
+            <option value="motor">Motores / Electrobombas / Portón Elevadizo</option>
+            <option value="frio">Refrigeradora / Congeladora (Cadena de Frío)</option>
+            <option value="clima">Aire Acondicionado / Climatización</option>
+            <option value="sensible">Equipos Electrónicos Sensibles / Computo</option>
+        </select>
 
-    // Tabla de Conductores CNE (60°C - 75°C Cu)
-    const TABLA_CABLES = [
-      { mm2: 1.5, awg: "16 AWG", amp: 15, res: 12.1 },
-      { mm2: 2.5, awg: "14 AWG", amp: 20, res: 7.41 },
-      { mm2: 4.0, awg: "12 AWG", amp: 25, res: 4.61 },
-      { mm2: 6.0, awg: "10 AWG", amp: 35, res: 3.08 },
-      { mm2: 10.0, awg: "8 AWG", amp: 50, res: 1.83 },
-      { mm2: 16.0, awg: "6 AWG", amp: 68, res: 1.15 },
-      { mm2: 25.0, awg: "4 AWG", amp: 89, res: 0.727 }
-    ];
+        <div class="results-box" id="recomendacionProteccionBox" style="margin-top: 10px; background: #fff3cd; border: 1px solid #ffeeba;">
+            <h4>Especificación Técnica Recomendada:</h4>
+            <p id="recTermomagnetico"><strong>Termomagnético:</strong> Curva C (Protección estándar contra sobrecargas y cortocircuitos).</p>
+            <p id="recDiferencial"><strong>Interruptor Diferencial (RCD):</strong> Tipo AC o A estándar (30mA) para protección de personas.</p>
+            <p id="recSobretension"><strong>Protección Sobretensiones (DPS):</strong> DPS Tipo 2 obligatorio en el Tablero General (Permanentes + Transitorias).</p>
+        </div>
+    </div>
 
-    const BREAKERS_ESTANDAR = [10, 16, 20, 25, 32, 40, 50, 63];
+    <script>
+        let areaTotalPonderada = 0;
+        let listaCargas = [];
 
-    let cargas = [
-      { nombre: "Refrigeradora", watts: 350, cantidad: 1 },
-      { nombre: "Microondas", watts: 1200, cantidad: 1 },
-      { nombre: "Hervador de Agua", watts: 1500, cantidad: 1 }
-    ];
-
-    function renderCargas() {
-      const contenedor = document.getElementById('contenedorCargas');
-      contenedor.innerHTML = '';
-
-      cargas.forEach((c, index) => {
-        const div = document.createElement('div');
-        div.className = 'flex items-center gap-2 bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/80';
-        div.innerHTML = `
-          <input type="text" value="${c.nombre}" onchange="actualizarCarga(${index}, 'nombre', this.value)" class="w-1/2 bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs font-medium text-white outline-none">
-          <div class="flex items-center gap-1 w-1/3">
-            <input type="number" value="${c.watts}" min="0" step="50" oninput="actualizarCarga(${index}, 'watts', this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs font-bold text-amber-400 outline-none text-right">
-            <span class="text-xs text-slate-400">W</span>
-          </div>
-          <button onclick="eliminarCarga(${index})" class="text-rose-400 hover:text-rose-300 p-1.5 text-xs font-bold">✕</button>
-        `;
-        contenedor.appendChild(div);
-      });
-
-      calcular();
-    }
-
-    function agregarFilaCarga() {
-      cargas.push({ nombre: "Nuevo Artefacto", watts: 500, cantidad: 1 });
-      renderCargas();
-    }
-
-    function agregarPreset(nombre, watts) {
-      cargas.push({ nombre, watts, cantidad: 1 });
-      renderCargas();
-    }
-
-    function eliminarCarga(index) {
-      cargas.splice(index, 1);
-      renderCargas();
-    }
-
-    function actualizarCarga(index, campo, valor) {
-      if (campo === 'watts') cargas[index].watts = parseFloat(valor) || 0;
-      if (campo === 'nombre') cargas[index].nombre = valor;
-      calcular();
-    }
-
-    function calcular() {
-      const V = parseFloat(document.getElementById('tension').value) || 220;
-      const FS = parseFloat(document.getElementById('factorSeguridad').value) || 1.25;
-      const L = parseFloat(document.getElementById('distancia').value) || 1;
-
-      const W_total = cargas.reduce((acc, curr) => acc + (curr.watts * curr.cantidad), 0);
-      const I_nom = W_total / V;
-      const I_diseno = I_nom * FS;
-
-      // Breaker Termomagnético
-      let itmSugerido = BREAKERS_ESTANDAR.find(b => b >= I_diseno) || 63;
-      
-      let curva = "C (Equipos habituales)";
-      const tieneMotores = cargas.some(c => c.nombre.toLowerCase().includes('aire') || c.nombre.toLowerCase().includes('bomba') || c.nombre.toLowerCase().includes('compresor'));
-      if (tieneMotores) curva = "D (Alta corriente de arranque)";
-
-      // Selección de Conductor evaluando Amperaje + Caída de tensión por distancia
-      let cableSeleccionado = TABLA_CABLES[0];
-      
-      for (let c of TABLA_CABLES) {
-        if (c.amp >= itmSugerido) {
-          // Fórmula monofásica: ΔV = (2 * L * I * R_km) / 1000
-          const deltaV = (2 * L * I_nom * (c.res / 1000));
-          const porcCaida = (deltaV / V) * 100;
-          
-          cableSeleccionado = c;
-          cableSeleccionado.caida = porcCaida;
-          cableSeleccionado.deltaV = deltaV;
-          
-          if (porcCaida <= 2.5) break; // Límite CNE para circuitos derivados es 2.5%
+        function agregarArea(tipo) {
+            let val = parseFloat(document.getElementById(tipo === 'piso' ? 'areaPisoVal' : 'areaSotanoVal').value) || 0;
+            if (val <= 0) return;
+            let aporte = (tipo === 'sotano') ? val * 0.75 : val;
+            areaTotalPonderada += aporte;
+            document.getElementById('lblAreaTotal').innerText = areaTotalPonderada.toFixed(2);
+            document.getElementById(tipo === 'piso' ? 'areaPisoVal' : 'areaSotanoVal').value = '';
+            
+            // Auto-generar o actualizar base de alumbrado según CNE
+            actualizarCargasBaseAlumbrado();
         }
-      }
 
-      // Interruptor Diferencial
-      let idAmp = BREAKERS_ESTANDAR.find(b => b >= itmSugerido) || 40;
+        function actualizarCargasBaseAlumbrado() {
+            // Lógica CNE: Primeros 90m2 = 2500W, siguientes por cada 90m2 o fracción = 1000W
+            let areaRestante = areaTotalPonderada;
+            let potenciaAlumbrado = 0;
+            
+            if (areaRestante > 0) {
+                potenciaAlumbrado += 2500; // Primeros 90m2
+                areaRestante -= 90;
+            }
+            while (areaRestante > 0) {
+                potenciaAlumbrado += 1000; // 1000W por cada 90m2 adicionales o fracción
+                areaRestante -= 90;
+            }
 
-      // Actualizar interfaz
-      document.getElementById('resPotencia').textContent = `${W_total.toLocaleString('es-PE')} W`;
-      document.getElementById('resCorriente').textContent = `${I_nom.toFixed(2)}A / ${I_diseno.toFixed(2)}A`;
-      document.getElementById('resDistanciaUI').textContent = `${L} m`;
-      document.getElementById('resCaidaTension').textContent = `${(cableSeleccionado.caida || 0).toFixed(2)} %`;
+            // Buscar si ya existe la fila base
+            let index = listaCargas.findIndex(c => c.esBase);
+            if (index >= 0) {
+                listaCargas[index].potencia = potenciaAlumbrado;
+            } else {
+                listaCargas.unshift({
+                    descripcion: `Alumbrado y Tomacorrientes (Área: ${areaTotalPonderada.toFixed(1)} m² según CNE)`,
+                    potencia: potenciaAlumbrado,
+                    factor: 1.0,
+                    esBase: true
+                });
+            }
+            renderizarTabla();
+        }
 
-      document.getElementById('resITM').textContent = `${itmSugerido} A`;
-      document.getElementById('resCurvaITM').textContent = `Curva ${curva}`;
+        function agregarFilaCarga() {
+            let desc = prompt("Descripción del equipo o carga especial (Ej: Cocina Eléctrica, Termasta, Aire Acondicionado):");
+            let pot = parseFloat(prompt("Potencia Instalada en Watts (W):", "1500"));
+            let fd = parseFloat(prompt("Factor de Demanda (Ej: 1.0, 0.75, 0.25):", "1.0"));
+            
+            if (desc && !isNaN(pot)) {
+                listaCargas.push({ descripcion: desc, potencia: pot, factor: isNaN(fd) ? 1.0 : fd, esBase: false });
+                renderizarTabla();
+            }
+        }
 
-      document.getElementById('resCable').textContent = `${cableSeleccionado.mm2} mm²`;
-      document.getElementById('resAWG').textContent = `Equiv: ${cableSeleccionado.awg} (Cap. máx: ${cableSeleccionado.amp}A)`;
-      document.getElementById('resDetalleCaida').textContent = `Caída de tensión: ${(cableSeleccionado.deltaV || 0).toFixed(2)} V a ${L}m`;
+        function eliminarFila(index) {
+            if (listaCargas[index].esBase) {
+                alert("La carga base de alumbrado calculada por área no se puede eliminar directamente.");
+                return;
+            }
+            listaCargas.splice(index, 1);
+            renderizarTabla();
+        }
 
-      document.getElementById('resID').textContent = `${idAmp} A / 30mA`;
+        function renderizarTabla() {
+            let tbody = document.getElementById('cuerpoTablaCargas');
+            tbody.innerHTML = '';
+            listaCargas.forEach((c, idx) => {
+                let maxDem = c.potencia * c.factor;
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${c.descripcion}</td>
+                    <td>${c.potencia.toFixed(2)} W</td>
+                    <td>${c.factor}</td>
+                    <td><strong>${maxDem.toFixed(2)} W</strong></td>
+                    <td><button class="btn-danger" onclick="eliminarFila(${idx})">Eliminar</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
 
-      // Mensajes de Diagnóstico
-      const cajaAlerta = document.getElementById('cajaAlerta');
-      cajaAlerta.classList.remove('hidden', 'bg-emerald-950', 'text-emerald-300', 'border-emerald-700', 'bg-rose-950', 'text-rose-300', 'border-rose-700', 'bg-amber-950', 'text-amber-300', 'border-amber-700');
-      cajaAlerta.classList.add('border');
+        function calcularCuadroCargas() {
+            let totalPotInstalada = 0;
+            let totalMaxDemanda = 0;
 
-      if (cableSeleccionado.caida > 2.5) {
-        cajaAlerta.classList.add('bg-amber-950', 'text-amber-300', 'border-amber-700');
-        cajaAlerta.innerHTML = `⚠️ <b>ADVERTENCIA POR DISTANCIA (${L} m):</b> La caída de tensión asciende a ${cableSeleccionado.caida.toFixed(2)}% (máximo recomendado: 2.5%). Para este tramo se ha sobredimensionado la sección del conductor a <b>${cableSeleccionado.mm2} mm²</b> para compensar la impedancia.`;
-      } else if (I_nom > 25 && cableSeleccionado.mm2 <= 4) {
-        cajaAlerta.classList.add('bg-rose-950', 'text-rose-300', 'border-rose-700');
-        cajaAlerta.innerHTML = `🚨 <b>ALERTA DE SOBRECARGA:</b> La corriente de consumo (${I_nom.toFixed(1)}A) supera la tolerancia recomendada para cables delgados. Se exige conductor de <b>${cableSeleccionado.mm2} mm²</b>.`;
-      } else {
-        cajaAlerta.classList.add('bg-emerald-950', 'text-emerald-300', 'border-emerald-700');
-        cajaAlerta.innerHTML = `✅ <b>CÁLCULO CORRECTO Y NORMATIVO:</b> La sección de ${cableSeleccionado.mm2} mm² satisface el amperaje y la distancia de ${L} metros dentro del límite del 2.5% impuesto por el CNE Perú.`;
-      }
-    }
+            listaCargas.forEach(c => {
+                totalPotInstalada += c.potencia;
+                totalMaxDemanda += (c.potencia * c.factor);
+            });
 
-    // Modal PDF
-    function abrirModalPDF() {
-      document.getElementById('modalPDF').classList.remove('hidden');
-      document.getElementById('modalPDF').classList.add('flex');
-    }
+            document.getElementById('resPotInstalada').innerText = totalPotInstalada.toFixed(2);
+            document.getElementById('resMaxDemanda').innerText = totalMaxDemanda.toFixed(2);
+            
+            // Potencia a contratar en kW considerando factor de simultaneidad 0.8
+            let potenciaContratadaKW = (totalMaxDemanda * 0.8) / 1000;
+            document.getElementById('resContratada').innerText = potenciaContratadaKW.toFixed(2);
+        }
 
-    function cerrarModalPDF() {
-      document.getElementById('modalPDF').classList.add('hidden');
-      document.getElementById('modalPDF').classList.remove('flex');
-    }
+        function actualizarRecomendacionProteccion() {
+            let tipo = document.getElementById('tipoCargaProteccion').value;
+            let term = document.getElementById('recTermomagnetico');
+            let dif = document.getElementById('recDiferencial');
+            let sob = document.getElementById('recSobretension');
 
-    function descargarPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      const cliente = document.getElementById('pdfCliente').value || "Cliente Residencial";
-      const electricista = document.getElementById('pdfElectricista').value || "Asesoría Eléctrica Eric";
-      const obra = document.getElementById('pdfObra').value || "Instalación Domiciliaria";
-      const notas = document.getElementById('pdfNotas').value || "Dimensionamiento verificado bajo la normativa CNE Perú.";
-      const distancia = document.getElementById('distancia').value || "15";
-
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(15);
-      doc.text("INFORME TÉCNICO DE DIMENSIONAMIENTO ELÉCTRICO", 15, 20);
-
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      doc.text(`Especialista / Empresa: ${electricista}`, 15, 29);
-      doc.text(`Cliente: ${cliente}`, 15, 34);
-      doc.text(`Ubicación / Proyecto: ${obra}`, 15, 39);
-      doc.text(`Fecha: ${new Date().toLocaleDateString('es-PE')}`, 15, 44);
-
-      doc.line(15, 48, 195, 48);
-
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(11);
-      doc.text("1. PARÁMETROS DEL TRAMO Y RESULTADOS", 15, 56);
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9.5);
-      doc.text(`• Distancia de la Canalización: ${distancia} metros`, 20, 64);
-      doc.text(`• Carga Total Calculada: ${document.getElementById('resPotencia').textContent}`, 20, 70);
-      doc.text(`• Corriente de Servicio / Diseño: ${document.getElementById('resCorriente').textContent}`, 20, 76);
-      doc.text(`• Conductor Seleccionado: ${document.getElementById('resCable').textContent} (${document.getElementById('resAWG').textContent})`, 20, 82);
-      doc.text(`• Caída de Tensión Calculada (ΔV): ${document.getElementById('resCaidaTension').textContent} (${document.getElementById('resDetalleCaida').textContent})`, 20, 88);
-      doc.text(`• Protección Termomagnética (ITM): ${document.getElementById('resITM').textContent} (${document.getElementById('resCurvaITM').textContent})`, 20, 94);
-      doc.text(`• Protección Diferencial Recomendada (ID): ${document.getElementById('resID').textContent}`, 20, 100);
-
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(11);
-      doc.text("2. OBSERVACIONES TÉCNICAS Y RECOMENDACIONES", 15, 112);
-      
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.text(doc.splitTextToSize(notas, 175), 15, 120);
-
-      doc.setFontSize(8);
-      doc.text("Documento generado mediante CNE Pro - Asesoría Eléctrica Eric", 15, 280);
-
-      doc.save(`Memoria_Calculo_CNE_${distancia}m_${Date.now()}.pdf`);
-      cerrarModalPDF();
-    }
-
-    // Inicializar app
-    renderCargas();
-  </script>
+            if (tipo === 'general') {
+                term.innerHTML = "<strong>Termomagnético:</strong> Curva C (Uso general en viviendas, protección térmica y magnética estándar).";
+                dif.innerHTML = "<strong>Interruptor Diferencial (RCD):</strong> Tipo AC o Tipo A de alta sensibilidad (30 mA) para protección contra contactos indirectos.";
+                sob.innerHTML = "<strong>Protección Sobretensiones (DPS):</strong> DPS Tipo 2 en Tablero General + Protector de Sobretensiones Permanentes y Mínimas/Máximas de tensión.";
+            } else if (tipo === 'motor') {
+                term.innerHTML = "<strong>Termomagnético:</strong> <u>Curva D</u> (Diseñada específicamente para soportar altas corrientes de arranque de motores y bombas sin dispararse en falsos positivos).";
+                dif.innerHTML = "<strong>Interruptor Diferencial (RCD):</strong> Tipo A o Tipo F con inmunidad reforzada para cargas inductivas.";
+                sob.innerHTML = "<strong>Protección Sobretensiones (DPS):</strong> Protector térmico de fases y DPS Tipo 2 contra descargas atmosféricas o transitorios de red.";
+            } else if (tipo === 'frio') {
+                term.innerHTML = "<strong>Termomagnético:</strong> Curva C estándar con calibre adecuado al compresor.";
+                dif.innerHTML = "<strong>Interruptor Diferencial (RCD):</strong> <u>Tipo A Rearmable / Autoarmable</u> (Vital para congeladoras: si ocurre un disparo transitorio, el equipo se rearmará automáticamente para evitar que se malogren los alimentos por pérdida de cadena de frío).";
+                sob.innerHTML = "<strong>Protección Sobretensiones (DPS):</strong> Protector de voltaje permanente con temporizador de reconexión (protege contra bajadas y subidas repentinas de tensión que queman tarjetas de refrigeración).";
+            } else if (tipo === 'clima') {
+                term.innerHTML = "<strong>Termomagnético:</strong> Curva C dedicada exclusivamente para el circuito de climatización.";
+                dif.innerHTML = "<strong>Interruptor Diferencial (RCD):</strong> <u>Tipo A Superinmunizado (SI)</u> (Los aires acondicionados con inversores/inverter generan armónicos que disparan diferenciales comunes; el superinmunizado evita falsos disparos).";
+                sob.innerHTML = "<strong>Protección Sobretensiones (DPS):</strong> DPS Tipo 2 integrado en el sub-tablero seccional del equipo.";
+            } else if (tipo === 'sensible') {
+                term.innerHTML = "<strong>Termomagnético:</strong> Curva C de alta precisión.";
+                dif.innerHTML = "<strong>Interruptor Diferencial (RCD):</strong> Tipo A o B de alta inmunidad.";
+                sob.innerHTML = "<strong>Protección Sobretensiones (DPS):</strong> DPS Tipo 2 + DPS Tipo 3 (protección fina) cerca de los equipos electrónicos sensibles.";
+            }
+        }
+    </script>
 </body>
 </html>
