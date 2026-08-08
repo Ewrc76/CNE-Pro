@@ -3,222 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora CNE y Selector de Protecciones Pro</title>
+    <title>Ingeniería Eléctrica Pro: Iluminación, CNE & Protecciones</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f9fa; color: #333; }
-        h1, h2 { color: #0056b3; }
-        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 15px; background: white; }
-        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: center; font-size: 14px; }
+        body { font-family: Arial, sans-serif; margin: 15px; background-color: #f4f6f9; color: #333; }
+        h1, h2, h3 { color: #004085; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .section { margin-bottom: 25px; padding: 15px; border: 1px solid #b8daff; background-color: #f8f9fa; border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; font-size: 12px; }
         th { background-color: #007bff; color: white; }
-        input, select { padding: 8px; margin: 5px; width: calc(100% - 20px); max-width: 220px; }
+        input, select { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
         button { padding: 10px 15px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; }
-        button.btn-danger { background: #dc3545; }
-        button:hover { opacity: 0.9; }
-        .results-box { background: #e9ecef; padding: 15px; border-radius: 6px; margin-top: 15px; }
+        button:hover { opacity: 0.85; }
+        .summary-box { background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 6px; margin-top: 15px; color: #155724; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
     </style>
 </head>
 <body>
 
-    <h1>Calculadora de Cuadro de Cargas CNE & Seleccionador de Protecciones</h1>
-    <p>Herramienta técnica para el cálculo de Máxima Demanda (CNE Utilización) y especificación de protecciones eléctricas avanzadas.</p>
+<div class="container">
+    <h1>Plataforma Integral de Ingeniería Eléctrica</h1>
+    <p>Cálculo de Iluminación (Lúmenes), Cuadro de Cargas CNE (Perú) y Selección Avanzada de Protecciones.</p>
 
-    <!-- SECCIÓN 1: ÁREAS TECHADAS -->
-    <div class="card">
-        <h2>1. Cálculo de Área Techada a Considerar (Regla 050-110 CNE)</h2>
-        <div class="grid-2">
+    <!-- MÓDULO 1: ILUMINACIÓN -->
+    <div class="section">
+        <h2>1. Diseño y Cálculo de Iluminación (Método de Lúmenes)</h2>
+        <div class="grid-3">
             <div>
-                <label>Área de Pisos Superiores / Piso 1 (100%):</label><br>
-                <input type="number" id="areaPisoVal" placeholder="Ej: 100 m²">
-                <button onclick="agregarArea('piso')">Añadir Piso</button>
+                <label>Ancho del Local (m):</label>
+                <input type="number" id="ilumAncho" value="5" step="0.1">
             </div>
             <div>
-                <label>Área de Sótano (75%):</label><br>
-                <input type="number" id="areaSotanoVal" placeholder="Ej: 50 m²">
-                <button onclick="agregarArea('sotano')">Añadir Sótano</button>
+                <label>Largo del Local (m):</label>
+                <input type="number" id="ilumLargo" value="6" step="0.1">
+            </div>
+            <div>
+                <label>Altura de Montaje (m):</label>
+                <input type="number" id="ilumAltura" value="2.8" step="0.1">
             </div>
         </div>
-        <p><strong>Área Total Ponderada Acumulada:</strong> <span id="lblAreaTotal">0</span> m²</p>
+
+        <div class="grid-2" style="margin-top: 10px;">
+            <div>
+                <label>Tipo de Área / Destino:</label>
+                <select id="ilumTipoArea" onchange="actualizarLuxSugeridos()">
+                    <option value="300">Oficinas / Est administrativo (300 lux)</option>
+                    <option value="200">Vivienda / Salas / Habitaciones (200 lux)</option>
+                    <option value="150">Circulaciones / Pasillos (150 lux)</option>
+                    <option value="500">Talleres / Trabajos de precisión (500 lux)</option>
+                </select>
+            </div>
+            <div>
+                <label>Nivel de Iluminancia Requerido (Lux):</label>
+                <input type="number" id="ilumLux" value="200">
+            </div>
+        </div>
+
+        <div class="grid-3" style="margin-top: 10px;">
+            <div>
+                <label>Temperatura de Color (Kelvin):</label>
+                <select id="ilumKelvin">
+                    <option value="3000K">3000K (Luz Cálida - Cálido acogedor)</option>
+                    <option value="4000K" selected>4000K (Luz Neutra - Oficinas/Casas)</option>
+                    <option value="6500K">6500K (Luz Fría / Daylight)</option>
+                </select>
+            </div>
+            <div>
+                <label>Tipo de Montaje:</label>
+                <select id="ilumMontaje">
+                    <option value="Empotrado">Empotrado (Panel / Downlight)</option>
+                    <option value="Adosado">Adosado (Plafón / Regleta)</option>
+                    <option value="Colgante">Colgante (Lámpara suspendida)</option>
+                </select>
+            </div>
+            <div>
+                <label>Tipo de Lámpara / Opción:</label>
+                <select id="ilumOpcionLampara" onchange="verificarLamparaPersonalizada()">
+                    <option value="panelLED18W">Panel LED Redondo 18W (1,440 lm)</option>
+                    <option value="tuboLED18W">Tubo LED T8 18W (1,800 lm)</option>
+                    <option value="campanaLED100W">Campana LED Industrial 100W (10,000 lm)</option>
+                    <option value="custom">Otra (Ingresar lúmenes manuales)</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="divCustomLampara" style="display:none; margin-top: 10px;" class="grid-2">
+            <div>
+                <label>Flujo Luminoso de la Lámpara (Lúmenes):</label>
+                <input type="number" id="customLumens" value="1500">
+            </div>
+            <div>
+                <label>Potencia de la Lámpara (Watts):</label>
+                <input type="number" id="customWatts" value="18">
+            </div>
+        </div>
+
+        <button onclick="calcularIluminacion()" style="margin-top: 15px; width: 100%; background-color: #007bff;">💡 Calcular Cantidad y Disposición de Lámparas</button>
+
+        <div class="summary-box" id="resIluminacionBox" style="display:none;">
+            <h3>Resultados de Iluminación:</h3>
+            <p><strong>Área del Local:</strong> <span id="resAreaLocal">0</span> m²</p>
+            <p><strong>Lúmenes Totales Requeridos:</strong> <span id="resLumTotales">0</span> lm</p>
+            <p><strong>Cantidad de Luminarias Necesarias:</strong> <span id="resCantLuminarias">0</span> unidades</p>
+            <p><strong>Disposición Sugerida:</strong> <span id="resDisposicion">Distribución uniforme</span></p>
+        </div>
     </div>
 
-    <!-- SECCIÓN 2: CUADRO DE CARGAS -->
-    <div class="card">
-        <h2>2. Cuadro de Cargas y Demanda Máxima</h2>
+    <!-- MÓDULO 2: CUADRO DE CARGAS CNE -->
+    <div class="section">
+        <h2>2. Cuadro de Cargas y Máxima Demanda (CNE - Perú)</h2>
+        <div class="grid-2">
+            <div>
+                <label>Área Pisos Superiores / Piso 1 (100%):</label>
+                <input type="number" id="inputAreaPiso" value="120">
+                <button onclick="agregarAreaPiso()">Añadir Piso</button>
+            </div>
+            <div>
+                <label>Área Sótano (75%):</label>
+                <input type="number" id="inputAreaSotano" value="40">
+                <button onclick="agregarAreaSotano()">Añadir Sótano</button>
+            </div>
+        </div>
+        <p><strong>Área Ponderada Total CNE:</strong> <span id="lblAreaPonderada">150</span> m²</p>
+
+        <div class="grid-2" style="margin-top: 10px;">
+            <div>
+                <label>Potencia Cocina Eléctrica (W):</label>
+                <input type="number" id="valCocina" value="14000">
+            </div>
+            <div>
+                <label>Potencia Calefacción (W):</label>
+                <input type="number" id="valCalefaccion" value="12000">
+            </div>
+            <div>
+                <label>Potencia Aire Acondicionado (W):</label>
+                <input type="number" id="valAire" value="5000">
+            </div>
+            <div>
+                <label>Termas / Calentadores de Agua (W):</label>
+                <input type="number" id="valTermas" value="4500">
+            </div>
+        </div>
+
+        <button onclick="calcularCuadroCompleto()" style="margin-top: 15px; width: 100%; background-color: #007bff;">⚡ Procesar Cuadro de Cargas CNE</button>
+
         <table>
             <thead>
                 <tr>
-                    <th>Descripción del Circuito / Equipo</th>
+                    <th>Descripción del Circuito</th>
                     <th>Potencia Instalada (W)</th>
                     <th>Factor de Demanda</th>
                     <th>Máxima Demanda (W)</th>
-                    <th>Acción</th>
                 </tr>
             </thead>
-            <tbody id="cuerpoTablaCargas">
-                <!-- Filas dinámicas -->
+            <tbody id="tablaResultadosCuerpo">
+                <tr><td colspan="4">Haga clic en procesar cuadro de cargas.</td></tr>
             </tbody>
         </table>
-        <button onclick="agregarFilaCarga()">+ Agregar Carga Manual</button>
-        <button onclick="calcularCuadroCargas()" style="background-color: #0056b3;">Calcular Cuadro Completo</button>
-        
-        <div class="results-box">
-            <h3>Resultados Generales:</h3>
-            <p><strong>Potencia Instalada Total:</strong> <span id="resPotInstalada">0</span> W</p>
-            <p><strong>Máxima Demanda Total (CNE):</strong> <span id="resMaxDemanda">0</span> W</p>
-            <p><strong>Potencia a Contratar Recomendada (Factor Simultaniedad 0.8):</strong> <span id="resContratada">0</span> kW</p>
+
+        <div class="summary-box">
+            <h3>Resultados Eléctricos Totales:</h3>
+            <p><strong>Potencia Instalada Total:</strong> <span id="resPI">0</span> W</p>
+            <p><strong>Máxima Demanda Total:</strong> <span id="resMD">0</span> W</p>
+            <p><strong>Potencia a Contratar (Factor 0.8):</strong> <span id="resContratada">0</span> kW</p>
         </div>
     </div>
 
-    <!-- SECCIÓN 3: SELECCIÓN AVANZADA DE PROTECCIONES Y DIFERENCIALES -->
-    <div class="card">
-        <h2>3. Criterio de Selección de Protecciones Específicas</h2>
-        <p>Selecciona el tipo de circuito o equipo crítico para determinar la protección termomagnética, diferencial y contra sobretensiones adecuada:</p>
-        
-        <label>Tipo de Carga / Aplicación:</label>
-        <select id="tipoCargaProteccion" onchange="actualizarRecomendacionProteccion()">
-            <option value="general">Tablero General / Iluminación y Tomacorrientes Generales</option>
-            <option value="motor">Motores / Electrobombas / Portón Elevadizo</option>
-            <option value="frio">Refrigeradora / Congeladora (Cadena de Frío)</option>
-            <option value="clima">Aire Acondicionado / Climatización</option>
-            <option value="sensible">Equipos Electrónicos Sensibles / Computo</option>
+    <!-- MÓDULO 3: PROTECCIONES -->
+    <div class="section">
+        <h2>3. Selección Técnica de Protecciones (Termomagnéticos, Diferenciales y DPS)</h2>
+        <label>Seleccione el tipo de circuito o aplicación:</label>
+        <select id="selectorProteccion" onchange="cambiarProteccion()">
+            <option value="general">Tablero General / Iluminación y Tomacorrientes</option>
+            <option value="motor">Motores / Electrobombas (Altas corrientes de arranque)</option>
+            <option value="frio">Refrigeración / Congeladores (Cadena de Frío)</option>
+            <option value="clima">Aire Acondicionado (Equipos con Electrónica / Inverter)</option>
         </select>
 
-        <div class="results-box" id="recomendacionProteccionBox" style="margin-top: 10px; background: #fff3cd; border: 1px solid #ffeeba;">
-            <h4>Especificación Técnica Recomendada:</h4>
-            <p id="recTermomagnetico"><strong>Termomagnético:</strong> Curva C (Protección estándar contra sobrecargas y cortocircuitos).</p>
-            <p id="recDiferencial"><strong>Interruptor Diferencial (RCD):</strong> Tipo AC o A estándar (30mA) para protección de personas.</p>
-            <p id="recSobretension"><strong>Protección Sobretensiones (DPS):</strong> DPS Tipo 2 obligatorio en el Tablero General (Permanentes + Transitorias).</p>
+        <div id="cajaProteccion" style="background: white; padding: 15px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            <p id="pTermo"><strong>Termomagnético:</strong> Curva C estándar (Protección general).</p>
+            <p id="pDif"><strong>Diferencial (RCD):</strong> Tipo AC o A de 30mA.</p>
+            <p id="pSob"><strong>Protección de Voltaje / DPS:</strong> DPS Tipo 2 en Tablero General.</p>
         </div>
     </div>
+</div>
 
-    <script>
-        let areaTotalPonderada = 0;
-        let listaCargas = [];
+<script>
+    let areasAcumuladas = 150; // Base inicial para demostración
 
-        function agregarArea(tipo) {
-            let val = parseFloat(document.getElementById(tipo === 'piso' ? 'areaPisoVal' : 'areaSotanoVal').value) || 0;
-            if (val <= 0) return;
-            let aporte = (tipo === 'sotano') ? val * 0.75 : val;
-            areaTotalPonderada += aporte;
-            document.getElementById('lblAreaTotal').innerText = areaTotalPonderada.toFixed(2);
-            document.getElementById(tipo === 'piso' ? 'areaPisoVal' : 'areaSotanoVal').value = '';
-            
-            // Auto-generar o actualizar base de alumbrado según CNE
-            actualizarCargasBaseAlumbrado();
+    function agregarAreaPiso() {
+        let val = parseFloat(document.getElementById('inputAreaPiso').value) || 0;
+        if(val > 0) {
+            areasAcumuladas += val;
+            document.getElementById('lblAreaPonderada').innerText = areasAcumuladas.toFixed(2);
+            document.getElementById('inputAreaPiso').value = '';
+        }
+    }
+
+    function agregarAreaSotano() {
+        let val = parseFloat(document.getElementById('inputAreaSotano').value) || 0;
+        if(val > 0) {
+            areasAcumuladas += (val * 0.75);
+            document.getElementById('lblAreaPonderada').innerText = areasAcumuladas.toFixed(2);
+            document.getElementById('inputAreaSotano').value = '';
+        }
+    }
+
+    function actualizarLuxSugeridos() {
+        let luxVal = document.getElementById('ilumTipoArea').value;
+        document.getElementById('ilumLux').value = luxVal;
+    }
+
+    function verificarLamparaPersonalizada() {
+        let tipo = document.getElementById('ilumOpcionLampara').value;
+        document.getElementById('divCustomLampara').style.display = (tipo === 'custom') ? 'grid' : 'none';
+    }
+
+    function calcularIluminacion() {
+        let ancho = parseFloat(document.getElementById('ilumAncho').value) || 1;
+        let largo = parseFloat(document.getElementById('ilumLargo').value) || 1;
+        let lux = parseFloat(document.getElementById('ilumLux').value) || 200;
+        let area = ancho * largo;
+
+        // Coeficiente de utilización promedio estimado (cuarto medio, paredes claras) y factor de mantenimiento (0.8)
+        let fUtilizacion = 0.60;
+        let fMantenimiento = 0.80;
+
+        let lúmenesTotales = (lux * area) / (fUtilizacion * fMantenimiento);
+
+        let lumenLampara = 1440;
+        let tipoLampara = document.getElementById('ilumOpcionLampara').value;
+        if(tipoLampara === 'tuboLED18W') lumenLampara = 1800;
+        if(tipoLampara === 'campanaLED100W') lumenLampara = 10000;
+        if(tipoLampara === 'custom') {
+            lumenLampara = parseFloat(document.getElementById('customLumens').value) || 1500;
         }
 
-        function actualizarCargasBaseAlumbrado() {
-            // Lógica CNE: Primeros 90m2 = 2500W, siguientes por cada 90m2 o fracción = 1000W
-            let areaRestante = areaTotalPonderada;
-            let potenciaAlumbrado = 0;
-            
-            if (areaRestante > 0) {
-                potenciaAlumbrado += 2500; // Primeros 90m2
-                areaRestante -= 90;
-            }
-            while (areaRestante > 0) {
-                potenciaAlumbrado += 1000; // 1000W por cada 90m2 adicionales o fracción
-                areaRestante -= 90;
-            }
+        let cantidad = Math.ceil(lúmenesTotales / lumenLampara);
+        
+        // Calcular disposición en filas y columnas aproximadas
+        let filas = Math.round(Math.sqrt(cantidad * (ancho / largo)));
+        if(filas < 1) filas = 1;
+        let columnas = Math.ceil(cantidad / filas);
 
-            // Buscar si ya existe la fila base
-            let index = listaCargas.findIndex(c => c.esBase);
-            if (index >= 0) {
-                listaCargas[index].potencia = potenciaAlumbrado;
-            } else {
-                listaCargas.unshift({
-                    descripcion: `Alumbrado y Tomacorrientes (Área: ${areaTotalPonderada.toFixed(1)} m² según CNE)`,
-                    potencia: potenciaAlumbrado,
-                    factor: 1.0,
-                    esBase: true
-                });
-            }
-            renderizarTabla();
+        document.getElementById('resAreaLocal').innerText = area.toFixed(2);
+        document.getElementById('resLumTotales').innerText = Math.round(lúmenesTotales).toLocaleString();
+        document.getElementById('resCantLuminarias').innerText = cantidad;
+        document.getElementById('resDisposicion').innerText = `${filas} fila(s) de ${columnas} luminarias (${document.getElementById('ilumMontaje').value}, Temperatura: ${document.getElementById('ilumKelvin').value})`;
+        
+        document.getElementById('resIluminacionBox').style.display = 'block';
+    }
+
+    function calcularCuadroCompleto() {
+        let area = areasAcumuladas;
+        let tbody = document.getElementById('tablaResultadosCuerpo');
+        tbody.innerHTML = '';
+        let filas = [];
+        let piTotal = 0;
+        let mdTotal = 0;
+
+        // Alumbrado por tramos de 90m2 CNE
+        let areaRestante = area;
+        let potAlumbrado = 0;
+        if(areaRestante > 0) { potAlumbrado += 2500; areaRestante -= 90; }
+        while(areaRestante > 0) { potAlumbrado += 1000; areaRestante -= 90; }
+        
+        filas.push({ desc: `Alumbrado y Tomacorrientes (Área Ponderada: ${area.toFixed(1)} m²)`, pi: potAlumbrado, fd: 1.0, md: potAlumbrado });
+
+        // Calefacción vs Aire Acondicionado
+        let valCalef = parseFloat(document.getElementById('valCalefaccion').value) || 0;
+        let valAireAcond = parseFloat(document.getElementById('valAire').value) || 0;
+        let mdCalef = (valCalef <= 10000) ? valCalef : (10000 + (valCalef - 10000) * 0.75);
+        let mdAire = valAireAcond;
+
+        if(mdCalef >= mdAire && valCalef > 0) {
+            filas.push({ desc: "Sistema de Calefacción (Mayor demanda seleccionada)", pi: valCalef, fd: (mdCalef/valCalef).toFixed(2), md: mdCalef });
+            if(valAireAcond > 0) filas.push({ desc: "Aire Acondicionado (No simultáneo - descartado)", pi: valAireAcond, fd: 0, md: 0 });
+        } else if(valAireAcond > 0) {
+            filas.push({ desc: "Aire Acondicionado (Mayor demanda seleccionada)", pi: valAireAcond, fd: 1.0, md: mdAire });
+            if(valCalef > 0) filas.push({ desc: "Sistema de Calefacción (No simultáneo - descartado)", pi: valCalef, fd: 0, md: 0 });
         }
 
-        function agregarFilaCarga() {
-            let desc = prompt("Descripción del equipo o carga especial (Ej: Cocina Eléctrica, Termasta, Aire Acondicionado):");
-            let pot = parseFloat(prompt("Potencia Instalada en Watts (W):", "1500"));
-            let fd = parseFloat(prompt("Factor de Demanda (Ej: 1.0, 0.75, 0.25):", "1.0"));
-            
-            if (desc && !isNaN(pot)) {
-                listaCargas.push({ descripcion: desc, potencia: pot, factor: isNaN(fd) ? 1.0 : fd, esBase: false });
-                renderizarTabla();
-            }
+        // Cocina Eléctrica
+        let valCoc = parseFloat(document.getElementById('valCocina').value) || 0;
+        if(valCoc > 0) {
+            let mdCocina = (valCoc <= 12000) ? 6000 : (6000 + (valCoc - 12000) * 0.40);
+            filas.push({ desc: "Cocina Eléctrica (>12kW: base + 40% exceso)", pi: valCoc, fd: (mdCocina/valCoc).toFixed(2), md: mdCocina });
         }
 
-        function eliminarFila(index) {
-            if (listaCargas[index].esBase) {
-                alert("La carga base de alumbrado calculada por área no se puede eliminar directamente.");
-                return;
-            }
-            listaCargas.splice(index, 1);
-            renderizarTabla();
+        // Termas
+        let valTer = parseFloat(document.getElementById('valTermas').value) || 0;
+        if(valTer > 0) {
+            filas.push({ desc: "Termas / Calentadores de Agua", pi: valTer, fd: 1.0, md: valTer });
         }
 
-        function renderizarTabla() {
-            let tbody = document.getElementById('cuerpoTablaCargas');
-            tbody.innerHTML = '';
-            listaCargas.forEach((c, idx) => {
-                let maxDem = c.potencia * c.factor;
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${c.descripcion}</td>
-                    <td>${c.potencia.toFixed(2)} W</td>
-                    <td>${c.factor}</td>
-                    <td><strong>${maxDem.toFixed(2)} W</strong></td>
-                    <td><button class="btn-danger" onclick="eliminarFila(${idx})">Eliminar</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
+        filas.forEach(f => {
+            piTotal += f.pi;
+            mdTotal += f.md;
+            let tr = document.createElement('tr');
+            tr.innerHTML = `<td>${f.desc}</td><td>${f.pi.toLocaleString()} W</td><td>${f.fd}</td><td><strong>${f.md.toLocaleString()} W</strong></td>`;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('resPI').innerText = piTotal.toLocaleString();
+        document.getElementById('resMD').innerText = mdTotal.toLocaleString();
+        document.getElementById('resContratada').innerText = ((mdTotal * 0.8) / 1000).toFixed(2);
+    }
+
+    function cambiarProteccion() {
+        let tipo = document.getElementById('selectorProteccion').value;
+        let pT = document.getElementById('pTermo');
+        let pD = document.getElementById('pDif');
+        let pS = document.getElementById('pSob');
+
+        if(tipo === 'general') {
+            pT.innerHTML = "<strong>Termomagnético:</strong> Curva C estándar.";
+            pD.innerHTML = "<strong>Diferencial (RCD):</strong> Tipo AC o A de 30mA.";
+            pS.innerHTML = "<strong>Protección de Voltaje:</strong> DPS Tipo 2 + Sobrevoltaje permanente.";
+        } else if(tipo === 'motor') {
+            pT.innerHTML = "<strong>Termomagnético:</strong> <u>Curva D</u> (Soporta picos de arranque de motores y bombas).";
+            pD.innerHTML = "<strong>Diferencial (RCD):</strong> Tipo A inmune a corrientes inductivas.";
+            pS.innerHTML = "<strong>Protección de Voltaje:</strong> Protector de fases y DPS Tipo 2.";
+        } else if(tipo === 'frio') {
+            pT.innerHTML = "<strong>Termomagnético:</strong> Curva C para compresores.";
+            pD.innerHTML = "<strong>Diferencial (RCD):</strong> <u>Tipo A Rearmable / Autoarmable</u> (Vital para congelación: rearme automático ante disparos transitorios para salvaguardar la cadena de frío).";
+            pS.innerHTML = "<strong>Protección de Voltaje:</strong> Protector permanente con temporizador de reconexión.";
+        } else if(tipo === 'clima') {
+            pT.innerHTML = "<strong>Termomagnético:</strong> Curva C dedicada.";
+            pD.innerHTML = "<strong>Diferencial (RCD):</strong> <u>Tipo A Superinmunizado (SI)</u> (Inmune a armónicos de equipos Inverter, evita falsos disparos).";
+            pS.innerHTML = "<strong>Protección de Voltaje:</strong> DPS Tipo 2 para climatización.";
         }
+    }
+</script>
 
-        function calcularCuadroCargas() {
-            let totalPotInstalada = 0;
-            let totalMaxDemanda = 0;
-
-            listaCargas.forEach(c => {
-                totalPotInstalada += c.potencia;
-                totalMaxDemanda += (c.potencia * c.factor);
-            });
-
-            document.getElementById('resPotInstalada').innerText = totalPotInstalada.toFixed(2);
-            document.getElementById('resMaxDemanda').innerText = totalMaxDemanda.toFixed(2);
-            
-            // Potencia a contratar en kW considerando factor de simultaneidad 0.8
-            let potenciaContratadaKW = (totalMaxDemanda * 0.8) / 1000;
-            document.getElementById('resContratada').innerText = potenciaContratadaKW.toFixed(2);
-        }
-
-        function actualizarRecomendacionProteccion() {
-            let tipo = document.getElementById('tipoCargaProteccion').value;
-            let term = document.getElementById('recTermomagnetico');
-            let dif = document.getElementById('recDiferencial');
-            let sob = document.getElementById('recSobretension');
-
-            if (tipo === 'general') {
-                term.innerHTML = "<strong>Termomagnético:</strong> Curva C (Uso general en viviendas, protección térmica y magnética estándar).";
-                dif.innerHTML = "<strong>Interruptor Diferencial (RCD):</strong> Tipo AC o Tipo A de alta sensibilidad (30 mA) para protección contra contactos indirectos.";
-                sob.innerHTML = "<strong>Protección Sobretensiones (DPS):</strong> DPS Tipo 2 en Tablero General + Protector de Sobretensiones Permanentes y Mínimas/Máximas de tensión.";
-            } else if (tipo === 'motor') {
-                term.innerHTML = "<strong>Termomagnético:</strong> <u>Curva D</u> (Diseñada específicamente para soportar altas corrientes de arranque de motores y bombas sin dispararse en falsos positivos).";
-                dif.innerHTML = "<strong>Interruptor Diferencial (RCD):</strong> Tipo A o Tipo F con inmunidad reforzada para cargas inductivas.";
-                sob.innerHTML = "<strong>Protección Sobretensiones (DPS):</strong> Protector térmico de fases y DPS Tipo 2 contra descargas atmosféricas o transitorios de red.";
-            } else if (tipo === 'frio') {
-                term.innerHTML = "<strong>Termomagnético:</strong> Curva C estándar con calibre adecuado al compresor.";
-                dif.innerHTML = "<strong>Interruptor Diferencial (RCD):</strong> <u>Tipo A Rearmable / Autoarmable</u> (Vital para congeladoras: si ocurre un disparo transitorio, el equipo se rearmará automáticamente para evitar que se malogren los alimentos por pérdida de cadena de frío).";
-                sob.innerHTML = "<strong>Protección Sobretensiones (DPS):</strong> Protector de voltaje permanente con temporizador de reconexión (protege contra bajadas y subidas repentinas de tensión que queman tarjetas de refrigeración).";
-            } else if (tipo === 'clima') {
-                term.innerHTML = "<strong>Termomagnético:</strong> Curva C dedicada exclusivamente para el circuito de climatización.";
-                dif.innerHTML = "<strong>Interruptor Diferencial (RCD):</strong> <u>Tipo A Superinmunizado (SI)</u> (Los aires acondicionados con inversores/inverter generan armónicos que disparan diferenciales comunes; el superinmunizado evita falsos disparos).";
-                sob.innerHTML = "<strong>Protección Sobretensiones (DPS):</strong> DPS Tipo 2 integrado en el sub-tablero seccional del equipo.";
-            } else if (tipo === 'sensible') {
-                term.innerHTML = "<strong>Termomagnético:</strong> Curva C de alta precisión.";
-                dif.innerHTML = "<strong>Interruptor Diferencial (RCD):</strong> Tipo A o B de alta inmunidad.";
-                sob.innerHTML = "<strong>Protección Sobretensiones (DPS):</strong> DPS Tipo 2 + DPS Tipo 3 (protección fina) cerca de los equipos electrónicos sensibles.";
-            }
-        }
-    </script>
 </body>
 </html>
