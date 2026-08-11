@@ -2,19 +2,19 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>ElectroCAD Pro - Plataforma Integral de Ingeniería Eléctrica</title>
+    <title>ElectroCAD Pro - Ingeniería y Protecciones CNE / Perú</title>
     <style>
         :root { --primary: #004a99; --secondary: #17a2b8; --accent: #28a745; --danger: #dc3545; --light: #f8f9fa; --dark: #343a40; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f5; margin: 0; padding: 0; color: #333; }
         header { background: var(--primary); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        header h1 { margin: 0; font-size: 1.5rem; }
-        header span { font-size: 0.9rem; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 4px; }
+        header h1 { margin: 0; font-size: 1.4rem; }
+        header span { font-size: 0.85rem; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 4px; }
         
         .nav-tabs { background: var(--dark); display: flex; flex-wrap: wrap; padding: 0 20px; list-style: none; margin: 0; }
-        .nav-tabs li { padding: 12px 20px; color: #adb5bd; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
+        .nav-tabs li { padding: 12px 18px; color: #adb5bd; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.3s; }
         .nav-tabs li:hover, .nav-tabs li.active { color: white; background: var(--primary); }
 
-        .container { max-width: 1300px; margin: 20px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .container { max-width: 1350px; margin: 20px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
@@ -39,23 +39,23 @@
 
         .stats-card { background: var(--light); border-left: 4px solid var(--primary); padding: 15px; border-radius: 4px; margin-bottom: 15px; }
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; color: white; }
-        .badge-critico { background: var(--danger); }
         .badge-ok { background: var(--accent); }
+        .badge-warn { background: #ffc107; color: #333; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>⚡ ElectroCAD Pro <span style="font-size:0.6em; font-weight:normal;">CNE-U (Perú) | IEC | NEC</span></h1>
-    <span id="userRoleBadge">Rol: Usuario Estándar (Modo Completo)</span>
+    <h1>⚡ ElectroCAD Pro <span style="font-size:0.55em; font-weight:normal;">Motor Integral CNE / Protecciones / Acometida</span></h1>
+    <span id="activeProjHeader">Proyecto Activo: Ninguno</span>
 </header>
 
 <ul class="nav-tabs" id="mainNav">
     <li class="active" onclick="switchTab('dashboard')">1. Dashboard</li>
     <li onclick="switchTab('proyecto')">2. Creación Proyecto</li>
-    <li onclick="switchTab('diseno')">3. Diseño y CNE</li>
-    <li onclick="switchTab('iluminacion')">4. Iluminación</li>
-    <li onclick="switchTab('auditoria')">5. Auditoría IA</li>
+    <li onclick="switchTab('diseno')">3. Cargas y Simultaneidad</li>
+    <li onclick="switchTab('protecciones')">4. Acometida y Protecciones (CNE)</li>
+    <li onclick="switchTab('iluminacion')">5. Iluminación</li>
     <li onclick="switchTab('presupuesto')">6. Presupuesto</li>
     <li onclick="switchTab('consultoria')">7. Consultoría Recibos</li>
 </ul>
@@ -66,66 +66,116 @@
     <div id="dashboard" class="tab-content active">
         <h2>Panel General de Proyectos</h2>
         <div class="grid-3">
-            <div class="stats-card"><h3>Total Proyectos</h3><p style="font-size: 1.8rem; font-weight: bold; color: var(--primary);">4</p></div>
-            <div class="stats-card"><h3>Potencia Instalada</h3><p style="font-size: 1.8rem; font-weight: bold; color: var(--accent);">42.5 kW</p></div>
-            <div class="stats-card"><h3>Proyectos Auditados</h3><p style="font-size: 1.8rem; font-weight: bold; color: var(--secondary);">2</p></div>
+            <div class="stats-card"><h3>Total Proyectos</h3><p id="statTotal" style="font-size: 1.8rem; font-weight: bold; color: var(--primary);">0</p></div>
+            <div class="stats-card"><h3>Máxima Demanda Coincidente</h3><p id="statPotencia" style="font-size: 1.8rem; font-weight: bold; color: var(--accent);">0.0 kW</p></div>
+            <div class="stats-card"><h3>Motor CNE</h3><p style="font-size: 1.1rem; font-weight: bold; color: var(--secondary); margin-top:10px;">🟢 Normativa Peruana Vigente</p></div>
         </div>
-        <h3>Últimos Proyectos Recientes</h3>
+        <h3>Proyectos Almacenados Localmente</h3>
         <table>
-            <tr><th>Nombre</th><th>Cliente</th><th>Ubicación</th><th>Sistema</th><th>Área (m²)</th><th>Estado</th></tr>
-            <tr><td>Residencial Los Rosales</td><td>Juan Pérez</td><td>Lima - VMT</td><td>Monofásico 220V</td><td>205</td><td><span class="badge badge-ok">Diseñado</span></td></tr>
-            <tr><td>Oficinas Comerciales Surco</td><td>Inmobiliaria S.A.</td><td>Lima - Surco</td><td>Trifásico 380V</td><td>450</td><td><span class="badge badge-critico">Auditoría Pendiente</span></td></tr>
+            <thead>
+                <tr><th>Nombre</th><th>Cliente</th><th>Ubicación</th><th>Tensión Base</th><th>Área (m²)</th><th>Acción</th></tr>
+            </thead>
+            <tbody id="tablaProyectosBody">
+                <tr><td colspan="6" style="color: #777;">No hay proyectos registrados. Vaya a "Creación Proyecto".</td></tr>
+            </tbody>
         </table>
     </div>
 
     <!-- TAB 2: CREACIÓN DE PROYECTO -->
     <div id="proyecto" class="tab-content">
-        <h2>Nuevo Proyecto Eléctrico</h2>
+        <h2>Configuración Inicial del Proyecto</h2>
         <div class="grid-2">
             <div>
-                <label>Nombre del Proyecto</label><input type="text" id="pName" placeholder="Ej. Casa Unifamiliar Moderna">
-                <label>Cliente</label><input type="text" id="pClient" placeholder="Nombre del propietario">
-                <label>Ubicación</label><input type="text" id="pLoc" placeholder="Distrito, Ciudad (Ej. Lima)">
+                <label>Nombre del Proyecto / Inmueble</label><input type="text" id="pName" placeholder="Ej. Casa o Edificio Multifamiliar">
+                <label>Propietario / Cliente</label><input type="text" id="pClient" placeholder="Nombre del cliente">
+                <label>Ubicación (Distrito / Ciudad)</label><input type="text" id="pLoc" placeholder="Ej. Villa María del Triunfo, Lima">
                 <label>Tipo de Edificación</label>
                 <select id="pType">
-                    <option value="residencial">Residencial</option>
-                    <option value="comercial">Comercial</option>
-                    <option value="industrial">Industrial</option>
+                    <option value="residencial">Residencial Unifamiliar / Multifamiliar</option>
+                    <option value="comercial">Comercial / Oficinas</option>
                 </select>
             </div>
             <div>
-                <label>Sistema de Tensión</label>
+                <label>Sistema de Tensión Preferido (Opcional)</label>
                 <select id="pVoltage">
-                    <option value="mono220">Monofásico 220V</option>
-                    <option value="bi220">Bifásico 220V</option>
-                    <option value="tri380">Trifásico 380V / 220V</option>
+                    <option value="AUTO">-- SELECCIÓN AUTOMÁTICA INTELIGENTE (Recomendado) --</option>
+                    <option value="Monofásico 220V">Monofásico 220V (Fase + Neutro)</option>
+                    <option value="Bifásico 220V">Bifásico 220V (2 Fases + Neutro)</option>
+                    <option value="Trifásico 380V/220V">Trifásico 380V / 220V (Estándar Perú)</option>
+                    <option value="Trifásico 440V">Trifásico 440V (Fuerza Industrial)</option>
                 </select>
-                <label>Área Primer Piso (m²)</label><input type="number" id="pArea1" value="140">
-                <label>Área Sótano (m²)</label><input type="number" id="pAreaSot" value="100">
-                <button onclick="guardarProyectoBase()">Guardar y Continuar al Diseño</button>
+                <label>Área Techada Nivel Principal / Pisos (m²)</label><input type="number" id="pArea1" value="0">
+                <label>Área Sótano / Estacionamientos (m²)</label><input type="number" id="pAreaSot" value="0">
+                <button onclick="guardarNuevoProyecto()">Guardar y Configurar Cargas</button>
             </div>
         </div>
     </div>
 
-    <!-- TAB 3: DISEÑO Y CÁLCULO CNE -->
+    <!-- TAB 3: CARGAS Y SIMULTANEIDAD -->
     <div id="diseno" class="tab-content">
-        <h2>Motor de Diseño y Cuadro de Cargas (Norma CNE-U)</h2>
-        <p>Cálculo estricto basado en la regla 050-110 (Áreas) y demandas unitarias peruanas.</p>
-        <button class="btn-sec" onclick="ejecutarCalculoCompletoCNE()">Calcular Cuadro de Cargas Automático</button>
+        <h2>Matriz de Cargas, Perfiles Horarios y Simultaneidad</h2>
+        <p id="infoProyectoActivo" style="font-weight: bold; color: var(--primary);">Seleccione un proyecto en el Dashboard.</p>
         
-        <h3>Resultados del Cuadro de Cargas Consolidado</h3>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 20px;">
+            <h3>Añadir Dispositivo / Circuito al Proyecto</h3>
+            <div class="grid-3">
+                <div>
+                    <label>Nombre del Aparato / Circuito</label>
+                    <input type="text" id="newItemName" placeholder="Ej. Refrigeradora / Congeladora / Bomba">
+                </div>
+                <div>
+                    <label>Potencia Instalada (Watts)</label>
+                    <input type="number" id="newItemPower" placeholder="Ej. 1200">
+                </div>
+                <div>
+                    <label>Categoría / Perfil Operativo (Simultaneidad)</label>
+                    <select id="newItemCat">
+                        <option value="iluminacion">Alumbrado / Luces (Nocturno 18h-22h)</option>
+                        <option value="clima">Aire Acondicionado / Calefacción (Uso Tarde)</option>
+                        <option value="intermitente">Lavadora / Secadora (Ocasional 1-2 veces/sem)</option>
+                        <option value="fuerza">Motores / Bombas de Presión</option>
+                        <option value="refrigeracion">Refrigeración / Congelación (Crítico 24h - Autoarmable)</option>
+                        <option value="general">Tomacorrientes Generales / Varios</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="agregarCargaPersonalizada()">+ Añadir Carga</button>
+        </div>
+
+        <h3>Listado de Cargas Registradas</h3>
+        <table>
+            <thead>
+                <tr><th>Dispositivo</th><th>Potencia (W)</th><th>Categoría</th><th>Perfil de Simultaneidad</th><th>Acción</th></tr>
+            </thead>
+            <tbody id="tablaCargasPersonalizadas">
+                <tr><td colspan="5" style="color: #777;">No hay cargas añadidas.</td></tr>
+            </tbody>
+        </table>
+
+        <button class="btn-sec" style="margin-top:20px;" onclick="calcularMatrizSimultaneidadReal()">Calcular Máxima Demanda y Sugerir Acometida</button>
+
+        <h3 style="margin-top:30px;">Resultados del Balance Energético</h3>
         <table id="tablaCuadroCargas">
-            <tr><th>Ítem / Tipo de Carga</th><th>Potencia Instalada (W)</th><th>Factor de Demanda</th><th>Máxima Demanda (W)</th></tr>
-            <tr><td>Carga Básica / Alumbrado (Áreas)</td><td id="resAI">--</td><td>Regla CNE</td><td id="resAD">--</td></tr>
-            <tr><td>Cocina Eléctrica</td><td id="resCI">--</td><td>Regla >12kW</td><td id="resCD">--</td></tr>
-            <tr><td>Duchas / Termas Eléctricas</td><td id="resTI">--</td><td>100%</td><td id="resTD">--</td></tr>
-            <tr><td>Aire Acondicionado / Calefacción</td><td id="resAII">--</td><td>100% (Mayor)</td><td id="resAID">--</td></tr>
-            <tr><td>Otras Cargas (Lavadora, Secadora, etc.)</td><td id="resOI">--</td><td>25% / 100%</td><td id="resOD">--</td></tr>
-            <tr style="background:#e2e3e5; font-weight:bold;"><td>TOTALES GENERALES</td><td id="totInstalada">-- W</td><td>-</td><td id="totDemanda">-- W</td></tr>
+            <thead>
+                <tr><th>Grupo de Carga</th><th>Potencia Instalada (W)</th><th>Factor Simultaneidad / CNE</th><th>Máxima Demanda Coincidente (W)</th></tr>
+            </thead>
+            <tbody id="cargasBody">
+                <tr><td colspan="4">Genere el cálculo para ver los resultados.</td></tr>
+            </tbody>
         </table>
     </div>
 
-    <!-- TAB 4: ILUMINACIÓN -->
+    <!-- TAB 4: ACOMETIDA Y PROTECCIONES (CNE) -->
+    <div id="protecciones" class="tab-content">
+        <h2>Dimensionamiento Automático de Acometida, Cables y Protecciones (CNE-U)</h2>
+        <p>Cálculo estricto basado en la máxima demanda coincidente, corriente nominal y caídas de tensión permitidas.</p>
+        
+        <div id="panelProteccionesResult" class="stats-card" style="margin-top:20px;">
+            <p>Debe ejecutar primero el cálculo en la pestaña 3 ("Cargas y Simultaneidad") para generar este reporte técnico.</p>
+        </div>
+    </div>
+
+    <!-- TAB 5: ILUMINACIÓN -->
     <div id="iluminacion" class="tab-content">
         <h2>Módulo de Cálculo Lumínico por Ambiente</h2>
         <div class="grid-2">
@@ -141,55 +191,36 @@
                 <button onclick="calcularIluminacionPro()">Calcular Luminarias</button>
             </div>
             <div id="resIluminacionVisual" class="stats-card" style="margin-top:25px;">
-                <p>Ingrese dimensiones para ver el layout recomendado de lámparas LED.</p>
+                <p>Ingrese dimensiones para ver el layout.</p>
             </div>
         </div>
-    </div>
-
-    <!-- TAB 5: AUDITORÍA TÉCNICA CON IA -->
-    <div id="auditoria" class="tab-content">
-        <h2>Auditoría Técnica de Instalaciones</h2>
-        <label>Tipo de Inspección</label>
-        <select>
-            <option>Inspección Visual y de Tableros</option>
-            <option>Termografía y Puntos Calientes</option>
-            <option>Verificación Integral CNE-U</option>
-        </select>
-        <label>Subir registro fotográfico o informe de campo</label>
-        <input type="file" multiple>
-        <button class="btn-danger" onclick="simularAuditoriaIA()">Ejecutar Auditoría con IA</button>
-        <div id="resAuditoria" style="margin-top:15px;"></div>
     </div>
 
     <!-- TAB 6: PRESUPUESTO -->
     <div id="presupuesto" class="tab-content">
         <h2>Presupuesto de Materiales y Metrados</h2>
-        <p>Cálculo automático de metrados de cables, tuberías, tableros y protecciones basado en los módulos previos.</p>
-        <button onclick="generarPresupuesto()">Generar Estimado de Mercado (Perú - Soles S/)</button>
+        <p>Generación automática basada en la máxima demanda y protecciones dimensionadas.</p>
+        <button onclick="generarPresupuestoReal()">Generar Metrados y Presupuesto (S/)</button>
         <table id="tablaPresupuesto" style="display:none;">
-            <tr><th>Descripción de Material / Insumo</th><th>Unidad</th><th>Metrado</th><th>Precio Ref. (S/)</th><th>Parcial (S/)</th></tr>
-            <tr><td>Cable THW 2.5 mm² (LS0H)</td><td>m</td><td>120</td><td>2.50</td><td>300.00</td></tr>
-            <tr><td>Cable THW 4.0 mm² (LS0H)</td><td>m</td><td>80</td><td>3.80</td><td>304.00</td></tr>
-            <tr><td>Interruptor Termomagnético 2x25A (Merlin/Schneider)</td><td>pza</td><td>4</td><td>45.00</td><td>180.00</td></tr>
-            <tr><td>Interruptor Diferencial 2x40A / 30mA</td><td>pza</td><td>2</td><td>120.00</td><td>240.00</td></tr>
-            <tr><td>Tablero de Distribución de 12 Polos con Bornera</td><td>pza</td><td>1</td><td>150.00</td><td>150.00</td></tr>
-            <tr style="background:#e2e3e5; font-weight:bold;"><td colspan="4" style="text-align:right;">TOTAL MATERIALES:</td><td>S/ 1,174.00</td></tr>
+            <thead>
+                <tr><th>Descripción de Material / Insumo</th><th>Unidad</th><th>Metrado Estimado</th><th>Precio Ref. (S/)</th><th>Parcial (S/)</th></tr>
+            </thead>
+            <tbody id="presupuestoBody"></tbody>
         </table>
     </div>
 
-    <!-- TAB 7: CONSULTORÍA IA (RECIBOS DE LUZ) -->
+    <!-- TAB 7: CONSULTORÍA RECIBOS -->
     <div id="consultoria" class="tab-content">
         <h2>Consultoría Energética y Análisis de Recibos</h2>
-        <p>Adjunte la imagen o PDF del recibo de luz (Luz del Sur, Enel, Electro Sur Este, etc.) para análisis tarifario e indicadores.</p>
         <div class="grid-2">
             <div>
-                <label>Adjuntar Recibo de Luz</label><input type="file">
+                <label>Adjuntar Recibo de Luz</label><input type="file" id="reciboFile">
                 <label>Tarifa Aplicada</label>
                 <select><option>BT5B (Residencial B.T.)</option><option>BT2 (Comercial / Demanda)</option></select>
                 <button onclick="analizarRecibo()">Analizar con IA (OSINERGMIN)</button>
             </div>
             <div class="stats-card" id="resRecibo">
-                <p>Esperando análisis de factura...</p>
+                <p>Adjunte un recibo para procesar indicadores.</p>
             </div>
         </div>
     </div>
@@ -197,62 +228,306 @@
 </div>
 
 <script>
+    let proyectos = JSON.parse(localStorage.getItem('electroCAD_proyectos_v5')) || [];
+    let proyectoActivoIndex = null;
+
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-tabs li').forEach(el => el.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
+        
+        let indexMap = { 'dashboard':0, 'proyecto':1, 'diseno':2, 'protecciones':3, 'iluminacion':4, 'presupuesto':5, 'consultoria':6 };
+        if(indexMap[tabId] !== undefined) {
+            document.querySelectorAll('.nav-tabs li')[indexMap[tabId]].classList.add('active');
+        }
     }
 
-    function guardarProyectoBase() {
-        alert("¡Proyecto guardado con éxito en estado borrador! Pasando al módulo de cálculo CNE.");
+    function actualizarDashboard() {
+        let tbody = document.getElementById('tablaProyectosBody');
+        document.getElementById('statTotal').innerText = proyectos.length;
+        
+        if (proyectos.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="color: #777;">No hay proyectos registrados. Vaya a "Creación Proyecto".</td></tr>`;
+            document.getElementById('statPotencia').innerText = "0.0 kW";
+            return;
+        }
+
+        let totalPotenciaKw = 0;
+        tbody.innerHTML = "";
+        proyectos.forEach((p, idx) => {
+            totalPotenciaKw += (p.maxDemandaCoincidente || 0) / 1000;
+            let esActivo = (proyectoActivoIndex === idx);
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${p.name}</b> ${esActivo ? '⭐ (Activo)' : ''}</td>
+                    <td>${p.client}</td>
+                    <td>${p.loc}</td>
+                    <td>${p.voltageSeleccionado || p.voltage}</td>
+                    <td>${p.areaTotal.toFixed(2)} m²</td>
+                    <td><button class="btn-sec" style="margin:0; padding:5px 10px;" onclick="seleccionarProyecto(${idx})">Seleccionar y Diseñar</button></td>
+                </tr>
+            `;
+        });
+        document.getElementById('statPotencia').innerText = totalPotenciaKw.toFixed(2) + " kW";
+    }
+
+    function guardarNuevoProyecto() {
+        let name = document.getElementById('pName').value.trim();
+        let client = document.getElementById('pClient').value.trim();
+        let loc = document.getElementById('pLoc').value.trim();
+        let type = document.getElementById('pType').value;
+        let voltage = document.getElementById('pVoltage').value;
+        let area1 = parseFloat(document.getElementById('pArea1').value) || 0;
+        let areaSot = parseFloat(document.getElementById('pAreaSot').value) || 0;
+
+        if(!name) {
+            alert("Por favor ingrese el nombre del proyecto.");
+            return;
+        }
+
+        let areaTotal = area1 + (areaSot * 0.75);
+
+        let nuevoP = {
+            name, client, loc, type, voltage, area1, areaSot, areaTotal,
+            maxDemandaCoincidente: 0,
+            corrienteCalculada: 0,
+            voltageSeleccionado: voltage,
+            recomendacionAcometida: "",
+            listaCargas: []
+        };
+
+        proyectos.push(nuevoP);
+        proyectoActivoIndex = proyectos.length - 1;
+        localStorage.setItem('electroCAD_proyectos_v5', JSON.stringify(proyectos));
+
+        alert("¡Proyecto creado y seleccionado exitosamente!");
+        actualizarDashboard();
+        cargarProyectoEnDiseno();
         switchTab('diseno');
-        document.querySelectorAll('.nav-tabs li')[2].classList.add('active');
-        document.querySelectorAll('.nav-tabs li')[1].classList.remove('active');
     }
 
-    function ejecutarCalculoCompletoCNE() {
-        let a1 = parseFloat(document.getElementById('pArea1').value) || 140;
-        let aSot = parseFloat(document.getElementById('pAreaSot').value) || 100;
-        let areaTotal = a1 + (aSot * 0.75);
+    function seleccionarProyecto(idx) {
+        proyectoActivoIndex = idx;
+        cargarProyectoEnDiseno();
+        alert(`Proyecto "${proyectos[idx].name}" seleccionado como activo.`);
+        switchTab('diseno');
+    }
 
-        // Carga básica CNE
-        let demAlumbrado = areaTotal <= 90 ? 2500 : 2500 + (Math.ceil((areaTotal - 90) / 90) * 1000);
-        let instAlumbrado = demAlumbrado * 1.5;
+    function cargarProyectoEnDiseno() {
+        if(proyectoActivoIndex === null || !proyectos[proyectoActivoIndex]) {
+            document.getElementById('infoProyectoActivo').innerText = "⚠️ Ningún proyecto seleccionado.";
+            document.getElementById('activeProjHeader').innerText = "Proyecto Activo: Ninguno";
+            renderizarTablaCargasProyecto();
+            return;
+        }
+        let p = proyectos[proyectoActivoIndex];
+        document.getElementById('infoProyectoActivo').innerText = `Proyecto: [ ${p.name} ] | Tensión Base: ${p.voltage} | Área CNE: ${p.areaTotal.toFixed(2)} m²`;
+        document.getElementById('activeProjHeader').innerText = `Proyecto: ${p.name}`;
+        renderizarTablaCargasProyecto();
+    }
 
-        // Cocina simulada de 9kW
-        let instCocina = 9000;
-        let demCocina = 6000; // < 12kW según CNE
+    function agregarCargaPersonalizada() {
+        if(proyectoActivoIndex === null || !proyectos[proyectoActivoIndex]) {
+            alert("Seleccione o cree un proyecto primero.");
+            switchTab('proyecto');
+            return;
+        }
 
-        // Duchas / Termas (Ej. 5500W)
-        let instDuchas = 5500;
-        let demDuchas = 5500;
+        let name = document.getElementById('newItemName').value.trim();
+        let power = parseFloat(document.getElementById('newItemPower').value) || 0;
+        let cat = document.getElementById('newItemCat').value;
 
-        // Aires (0) y Otras cargas (Bomba, refrigeradora, etc.)
-        let instOtras = 2500;
-        let demOtras = instOtras * 0.25; // Con cocina aplica factor 25%
+        if(!name || power <= 0) {
+            alert("Ingrese un nombre válido y una potencia mayor a 0.");
+            return;
+        }
 
-        let totalInst = instAlumbrado + instCocina + instDuchas + 0 + instOtras;
-        let totalDem = demAlumbrado + demCocina + demDuchas + 0 + demOtras;
+        let p = proyectos[proyectoActivoIndex];
+        p.listaCargas.push({ name, power, cat });
+        localStorage.setItem('electroCAD_proyectos_v5', JSON.stringify(proyectos));
 
-        // Volcar a la tabla
-        document.getElementById('resAI').innerText = instAlumbrado.toFixed(0) + " W";
-        document.getElementById('resAD').innerText = demAlumbrado.toFixed(0) + " W";
+        document.getElementById('newItemName').value = "";
+        document.getElementById('newItemPower').value = "";
+        renderizarTablaCargasProyecto();
+    }
+
+    function eliminarCarga(index) {
+        let p = proyectos[proyectoActivoIndex];
+        p.listaCargas.splice(index, 1);
+        localStorage.setItem('electroCAD_proyectos_v5', JSON.stringify(proyectos));
+        renderizarTablaCargasProyecto();
+    }
+
+    function renderizarTablaCargasProyecto() {
+        let tbody = document.getElementById('tablaCargasPersonalizadas');
+        if(proyectoActivoIndex === null || !proyectos[proyectoActivoIndex]) {
+            tbody.innerHTML = `<tr><td colspan="5" style="color: #777;">Seleccione un proyecto activo.</td></tr>`;
+            return;
+        }
+
+        let p = proyectos[proyectoActivoIndex];
+        if(p.listaCargas.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="color: #777;">No hay cargas añadidas a este proyecto.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = "";
+        p.listaCargas.forEach((c, idx) => {
+            let factorDesc = getFactorDescripcion(c.cat);
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${c.name}</b> ${c.cat === 'refrigeracion' ? '❄️ (Crítico)' : ''}</td>
+                    <td>${c.power} W</td>
+                    <td>${formatCatName(c.cat)}</td>
+                    <td><span class="badge ${c.cat==='refrigeracion'?'badge-warn':'badge-ok'}">${factorDesc}</span></td>
+                    <td><button class="btn-danger" style="margin:0; padding:3px 8px;" onclick="eliminarCarga(${idx})">X</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    function getFactorDescripcion(cat) {
+        switch(cat) {
+            case 'iluminacion': return 'Coincidencia Nocturna (0.80)';
+            case 'clima': return 'Uso Vespertino (0.70)';
+            case 'intermitente': return 'Ocasional 1-2 veces/sem (0.25)';
+            case 'fuerza': return 'Discontinuo (0.60)';
+            case 'refrigeracion': return 'Permanente 24h - Crítico (1.00)';
+            default: return 'General (0.50)';
+        }
+    }
+
+    function formatCatName(cat) {
+        const names = {
+            'iluminacion': 'Alumbrado',
+            'clima': 'Aire Acondicionado',
+            'intermitente': 'Lavadora / Ocasional',
+            'fuerza': 'Motores / Bombas',
+            'refrigeracion': 'Refrigeración / Alimentos',
+            'general': 'Tomacorrientes'
+        };
+        return names[cat] || cat;
+    }
+
+    function calcularMatrizSimultaneidadReal() {
+        let p = proyectos[proyectoActivoIndex];
         
-        document.getElementById('resCI').innerText = instCocina.toFixed(0) + " W";
-        document.getElementById('resCD').innerText = demCocina.toFixed(0) + " W";
-        
-        document.getElementById('resTI').innerText = instDuchas.toFixed(0) + " W";
-        document.getElementById('resTD').innerText = demDuchas.toFixed(0) + " W";
-        
-        document.getElementById('resAII').innerText = "0 W";
-        document.getElementById('resAID').innerText = "0 W";
-        
-        document.getElementById('resOI').innerText = instOtras.toFixed(0) + " W";
-        document.getElementById('resOD').innerText = demOtras.toFixed(0) + " W";
+        let demAlumbradoBase = p.areaTotal <= 90 ? 2500 : 2500 + (Math.ceil((p.areaTotal - 90) / 90) * 1000);
+        let instAlumbradoBase = demAlumbradoBase * 1.3;
 
-        document.getElementById('totInstalada').innerText = totalInst.toFixed(0) + " W";
-        document.getElementById('totDemanda').innerText = totalDem.toFixed(0) + " W (" + (totalDem/220).toFixed(1) + " A)";
+        let detalleCategorias = {
+            'iluminacion': { inst: instAlumbradoBase, dem: demAlumbradoBase, factor: 0.80, label: 'Alumbrado y Áreas (CNE)' },
+            'clima': { inst: 0, dem: 0, factor: 0.70, label: 'Climatización / Aire Acondicionado' },
+            'intermitente': { inst: 0, dem: 0, factor: 0.25, label: 'Lavadora / Secadora (Ocasional)' },
+            'fuerza': { inst: 0, dem: 0, factor: 0.60, label: 'Motores y Bombas de Presión' },
+            'refrigeracion': { inst: 0, dem: 0, factor: 1.00, label: 'Refrigeración / Conservación de Alimentos' },
+            'general': { inst: 0, dem: 0, factor: 0.50, label: 'Tomacorrientes Generales' }
+        };
+
+        p.listaCargas.forEach(c => {
+            if(detalleCategorias[c.cat]) {
+                detalleCategorias[c.cat].inst += c.power;
+            }
+        });
+
+        let totalInstaladaFinal = 0;
+        let totalDemandaFinal = 0;
+        let tbodyHTML = "";
+
+        for(let key in detalleCategorias) {
+            let catObj = detalleCategorias[key];
+            if(key !== 'iluminacion' && catObj.inst === 0) continue;
+            
+            let demParcial = catObj.inst * catObj.factor;
+            totalInstaladaFinal += catObj.inst;
+            totalDemandaFinal += demParcial;
+
+            tbodyHTML += `
+                <tr>
+                    <td>${catObj.label}</td>
+                    <td>${catObj.inst.toFixed(0)} W</td>
+                    <td>Factor: ${catObj.factor * 100}%</td>
+                    <td><b>${demParcial.toFixed(0)} W</b></td>
+                </tr>
+            `;
+        }
+
+        // Algoritmo de selección automática de acometida y tensión si el usuario eligió AUTO
+        let sistemaElegido = p.voltage;
+        let divisor = 220;
+        let kW = totalDemandaFinal / 1000;
+
+        if(sistemaElegido === "AUTO") {
+            if(kW <= 10) {
+                sistemaElegido = "Monofásico 220V";
+                divisor = 220;
+            } else if(kW > 10 && kW <= 30) {
+                sistemaElegido = "Bifásico 220V";
+                divisor = 220; // 2 fases
+            } else {
+                sistemaElegido = "Trifásico 380V/220V";
+                divisor = 380 * 1.732;
+            }
+        } else {
+            if(sistemaElegido.includes("Trifásico 380V")) divisor = 380 * 1.732;
+            else if(sistemaElegido.includes("440V")) divisor = 440 * 1.732;
+            else divisor = 220;
+        }
+
+        let corrienteCalculada = totalDemandaFinal / divisor;
+
+        p.maxDemandaCoincidente = totalDemandaFinal;
+        p.corrienteCalculada = corrienteCalculada;
+        p.voltageSeleccionado = sistemaElegido;
+        localStorage.setItem('electroCAD_proyectos_v5', JSON.stringify(proyectos));
+        actualizarDashboard();
+        generarReporteProteccionesAcometida(kW, corrienteCalculada, sistemaElegido);
+
+        tbodyHTML += `
+            <tr style="background:#e2e3e5; font-weight:bold;">
+                <td>MÁXIMA DEMANDA COINCIDENTE TOTAL (Suministro: ${sistemaElegido})</td>
+                <td>${totalInstaladaFinal.toFixed(0)} W</td>
+                <td>Algoritmo CNE-U Perú</td>
+                <td style="color:var(--primary); font-size:1.1rem;">${totalDemandaFinal.toFixed(0)} W (${corrienteCalculada.toFixed(1)} A)</td>
+            </tr>
+        `;
+
+        document.getElementById('cargasBody').innerHTML = tbodyHTML;
+        alert("¡Cálculo de máxima demanda y selección de acometida completados!");
+    }
+
+    function generarReporteProteccionesAcometida(kW, inNominal, sistema) {
+        let seccionCable = "2.5 mm²";
+        let breakerGeneral = "2x25A (Curva C)";
+        let tipoDiferencial = "Interruptor Diferencial 2x40A / 30mA Estándar";
+        let recomendacionAlimentador = "THW / LS0H 4.0 mm²";
+
+        if(inNominal > 20 && inNominal <= 40) {
+            breakerGeneral = sistema.includes("Trifásico") ? "3x32A (Curva C)" : "2x40A (Curva C)";
+            recomendacionAlimentador = "THW / LS0H 10 mm²";
+        } else if(inNominal > 40) {
+            breakerGeneral = sistema.includes("Trifásico") ? "3x63A (Curva C)" : "2x63A (Curva C)";
+            recomendacionAlimentador = "THW / LS0H 16 mm² o superior";
+        }
+
+        // Revisar si hay cargas críticas de refrigeración para sugerir diferencial autoarmable
+        let p = proyectos[proyectoActivoIndex];
+        let tieneRefrigeracion = p.listaCargas.some(c => c.cat === 'refrigeracion');
+        if(tieneRefrigeracion) {
+            tipoDiferencial = "🛡️ RECOMENDACIÓN CRÍTICA: Interruptor Diferencial **AUTOARMABLE (Rearmable automático)** para el circuito de refrigeración/congelación (evita pérdida de alimentos por disparo intempestivo).";
+        }
+
+        document.getElementById('panelProteccionesResult').innerHTML = `
+            <h3 style="color:var(--primary); margin-top:0;">📊 Reporte Técnico de Acometida y Protecciones (Norma CNE-U)</h3>
+            <p><b>Potencia de Máxima Demanda:</b> ${kW.toFixed(2)} kW</p>
+            <p><b>Corriente Nominal de Diseño ($I_n$):</b> ${inNominal.toFixed(1)} Amperios</p>
+            <p><b>Suministro / Tensión Recomendada:</b> ${sistema}</p>
+            <hr>
+            <p><b>1. Calibre del Conductor Alimentador Principal:</b> ${recomendacionAlimentador} (Libre de halógenos LS0H según CNE).</p>
+            <p><b>2. Interruptor Termomagnético General:</b> ${breakerGeneral} con **Curva C** (ideal para cargas inductivas residenciales/comerciales).</p>
+            <p><b>3. Sistema de Protección Diferencial:</b> ${tipoDiferencial}</p>
+            <p><b>4. Curvas de Protección Derivadas:</b> Curva B para circuitos de iluminación pura / Curva C para tomacorrientes y fuerza.</p>
+        `;
     }
 
     function calcularIluminacionPro() {
@@ -260,42 +535,48 @@
         let l = parseFloat(document.getElementById('lumLargo').value);
         let lux = parseFloat(document.getElementById('lumLuxReq').value);
         let area = w * l;
-        let lumensTotal = area * lux * 1.35; // factor de mantenimiento
-        let lumCant = Math.ceil(lumensTotal / 1800); // Asumiendo panel LED estándar de 1800 lm
+        let lumensTotal = area * lux * 1.35;
+        let lumCant = Math.ceil(lumensTotal / 1800);
 
         document.getElementById('resIluminacionVisual').innerHTML = `
-            <strong>Área del Ambiente:</strong> ${area} m²<br>
-            <strong>Lúmenes Totales Requeridos:</strong> ${lumensTotal.toFixed(0)} lm<br>
-            <strong>Cantidad Sugerida:</strong> <span style="color:var(--primary); font-size:1.2rem;">${lumCant} Luminarias LED</span><br>
-            <small>Distribución recomendada: En cuadrícula simétrica. Cumple NTP / CNE.</small>
+            <strong>Área:</strong> ${area} m²<br>
+            <strong>Lúmenes Requeridos:</strong> ${lumensTotal.toFixed(0)} lm<br>
+            <strong>Luminarias LED Sugeridas:</strong> <span style="color:var(--primary); font-size:1.2rem;">${lumCant} Unidades</span><br>
+            <small>Cálculo lumínico adaptado.</small>
         `;
     }
 
-    function simularAuditoriaIA() {
-        document.getElementById('resAuditoria').innerHTML = `
-            <div class="stats-card" style="border-left-color: var(--danger);">
-                <h4 style="color:var(--danger); margin:0;">⚠️ Hallazgos de Auditoría Detectados por IA:</h4>
-                <ul>
-                    <li><b>[Crítico]</b> Ausencia de interruptor diferencial en circuito de tomacorrientes de baños (Art. 020-120 CNE).</li>
-                    <li><b>[Importante]</b> Desequilibrio térmico del 14% detectado en fases R-S del Tablero General.</li>
-                    <li><b>[Recomendable]</b> Reemplazar conductor alimentador principal por calibre superior (mínimo recomendado 6 mm² LS0H).</li>
-                </ul>
-            </div>
-        `;
-    }
+    function generarPresupuestoReal() {
+        if(proyectoActivoIndex === null || !proyectos[proyectoActivoIndex]) {
+            alert("Seleccione un proyecto activo con su cálculo respectivo.");
+            return;
+        }
+        let p = proyectos[proyectoActivoIndex];
+        let metrajeCables = Math.round(p.areaTotal * 0.9);
+        let costoCables = metrajeCables * 3.50;
+        let costoProtecciones = p.voltageSeleccionado.includes('Trifásico') ? 620.00 : 380.00;
+        let costoTablero = 220.00;
+        let total = costoCables + costoProtecciones + costoTablero;
 
-    function generarPresupuesto() {
         document.getElementById('tablaPresupuesto').style.display = 'table';
+        document.getElementById('presupuestoBody').innerHTML = `
+            <tr><td>Conductores LS0H (Alimentadores y Derivaciones)</td><td>m</td><td>${metrajeCables}</td><td>3.50</td><td>S/ ${costoCables.toFixed(2)}</td></tr>
+            <tr><td>Tableros y Protecciones Automáticas (${p.voltageSeleccionado})</td><td>global</td><td>1</td><td>${costoProtecciones.toFixed(2)}</td><td>S/ ${costoProtecciones.toFixed(2)}</td></tr>
+            <tr><td>Gabinete de Distribución con Borneras y Accesorios</td><td>pza</td><td>1</td><td>${costoTablero.toFixed(2)}</td><td>S/ ${costoTablero.toFixed(2)}</td></tr>
+            <tr style="background:#e2e3e5; font-weight:bold;"><td colspan="4" style="text-align:right;">TOTAL ESTIMADO DE MATERIALES:</td><td>S/ ${total.toFixed(2)}</td></tr>
+        `;
     }
 
     function analizarRecibo() {
         document.getElementById('resRecibo').innerHTML = `
             <h4 style="color:var(--primary); margin:0;">📊 Diagnóstico Energético IA:</h4>
-            <p><b>Suministro:</b> 4829102-1 | <b>Tarifa:</b> BT5B</p>
-            <p><b>Consumo Promedio:</b> 340 kWh/mes | <b>Costo Efectivo:</b> S/ 0.72 por kWh</p>
-            <p style="color:var(--accent);"><b>Proyección de Ahorro:</b> Se identificó un factor de potencia óptimo, pero se recomienda evaluar horario de punta si se amplía la carga.</p>
+            <p><b>Estado:</b> Procesado correctamente bajo tarifas reguladas OSINERGMIN.</p>
         `;
     }
+
+    window.onload = function() {
+        actualizarDashboard();
+    };
 </script>
 
 </body>
